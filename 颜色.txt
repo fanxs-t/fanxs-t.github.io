@@ -1,0 +1,10 @@
+橙红：
+<font color=#FF4040>
+草绿：
+#7FFF00
+墨绿：
+<font color=#458B74>
+暗蓝：
+<font color=#104E8B>
+灰白：
+<font color=#D4D4D4>

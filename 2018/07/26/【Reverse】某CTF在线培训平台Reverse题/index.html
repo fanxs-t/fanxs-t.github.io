@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Fanxs">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Fanxs">
+    
+    <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="Just a blog.">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>【Reverse】某CTF在线培训平台Reverse题 · Mrfan&#39;s Room.</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/bm.png">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin="">
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin="">
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Mrfan&#39;s Room.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">【Reverse】某CTF在线培训平台Reverse题</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href="/">Mrfan's Room.</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="
+
+
+
+
+
+
+
+height:50vh;
+">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            【Reverse】某CTF在线培训平台Reverse题
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="CTF">CTF</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="逆向">逆向</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">2k</span>阅读时长: <span class="post-count reading-time">7 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2018/07/26</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p>这几天客户要参加一个CTF竞赛，据说是在一个CTF在线培训平台上抽题来做赛题，就让我们把题做了之后给他们培训CTF。这个平台里只有一道reverse的题，名字还是取了最近特别火的电影“我不是药神”之名（这电影巨好看，业界良心），这几天虽然忙着测一个智能设备，但还是抽出时间想来试试这道reverse题。</p>
+<h2 id="0x00-初探"><a href="#0x00-初探" class="headerlink" title="0x00. 初探"></a>0x00. 初探</h2><p><img src="http://media.mrfan.today/bc3b06317e6bad96fa80f27900419bef.png" alt="题目"><br>这道题为一个EXE文件，打开后需要输入名字和key来通关，如果输错了，则会“爆炸”。迫不及待打开了exe，瞎填了名字和key，想看看报错的语句是什么（方便后来ida里寻找）。</p>
+<p>刚输完名字，程序就关掉了……看来是只有输入了固定的名字，才能走到输入key那一步。好吧，那就直接IDA上吧。</p>
+<h2 id="0x01-IDA起！找名字！"><a href="#0x01-IDA起！找名字！" class="headerlink" title="0x01. IDA起！找名字！"></a>0x01. IDA起！找名字！</h2><p>IDA挂上exe，先来静态分析。打开String窗口，看了一圈发现了明显的输出字段：<br><img src="http://media.mrfan.today/7b4be4eab1b09fcfd9b7418b444f1eb2.png" alt=""><br>    直接跳到相关函数处：<br><img src="http://media.mrfan.today/23f6f1d23f59a5d75d428c6daad6b732.png" alt=""><br>这里截取了对名字判断的部分，直接F5看伪代码。这里的consolePrint，stringInit，getInput函数都是我分析了函数功能后加上的重命名。分析中间的循环体，可见对我们输入的name字段和“nsfocus”字符串一位一位作对比，若两个字符串存在不同之处，则break跳出循环，将结果nameFilterResult设置为1，输出“No Auth”后结束进程。显然，合理的名字就只有“nsfocus”了。</p>
+<p>那我们给输入”nsfocus”继续往下走:<br><img src="http://media.mrfan.today/774df09ad212f1e638b181e85b3f3f4b.png" alt=""><br>阔以了~终于让我们走到第二部输入key了，赶紧输一个试试……<br><img src="http://media.mrfan.today/62d692d894f0d524c882ca41c9d2c3f7.png" alt=""><br>？？？？？？？？？？？？？？？<br>就这样在目瞪口呆中，虚拟机被关掉了。。。日诶<br>（ 这就是传说中的爆炸吗 Orz…</p>
+<h2 id="0x02-IDA跑！找key啊喂"><a href="#0x02-IDA跑！找key啊喂" class="headerlink" title="0x02. IDA跑！找key啊喂"></a>0x02. IDA跑！找key啊喂</h2><p>没有一点点防备，也没有一丝顾虑，你就这样关机……为了防止关机，我另起了一个cmd，专门执行shutdown.exe -a来停止关机……（醉 눈_눈</p>
+<p>key判断的部分茫茫地长。。<br><img src="http://media.mrfan.today/5c7d124c3eb14e2955f3e7e4c83c8e67.png" alt=""><br><img src="http://media.mrfan.today/127684a6939519ac3f34969f4dfd609d.png" alt=""><br><img src="http://media.mrfan.today/f7e107835b8fae76564901e5d43a7218.png" alt=""></p>
+<p>从结果往上推，可见我们需要的是“Congratulation..”的那个结果，要求sub_402BE0函数的返回结果必须为True。这个函数用到了3个参数，<font color="#FF4040">v34, key, v48-v19 </font>。</p>
+<p>那我们先从key入手。可见在中间位置，有对key重新赋值的一个循环：<br><img src="http://media.mrfan.today/17b9887eee3e15c4af365333028a9232.png" alt=""><br>第一个do while循环，用v57取出key里的字符，若字符不为空，则v51指针++，取下一个字符。可见此循环意在将v51推到key的结尾，循环结束时，v51的位置为key的终结符后一位。</p>
+<p>因此，for循环的第一个参数 v51-v26-1，则是算出了key的长度了（其实严格来说是 length – 1），将这个值给参数i初始化，之后取出 v24 = key[i]，再–i，可见是由尾部向头部取出key的值，再执行以下关键操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">key[i] ^= string[v50 - v24 - 1 - i]^dword_41E378 ^*(&amp;predefinedKey + i % 7)</span><br></pre></td></tr></table></figure></p>
+<p>第一部分即为string[ length – 1 – i]，从头开始取出string的值，string[0],string[1],string[2]……dword_41E378则会被每次的计算结果所重新赋值。第三部分，可看到这是个字符数组predefindedKey[7] = “nomoney”，取出i%7位置的值，如果 i为7，则在这个数组里取出”n”，若i为8，则取出”o”，以此类推。</p>
+<p>这个循环可初步判断为这道题的关键点，用python可模拟为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">predefinedKey = [110,111,109,111,110,101,121]     # nomoney</span><br><span class="line">length = len(key)</span><br><span class="line">for i in range(length-1, 0 ,-1):</span><br><span class="line">    key[i] = key[i] ^ string[length-1-i] ^ dword ^ predefinedKey[i%7]</span><br><span class="line">    dword = key[i]</span><br></pre></td></tr></table></figure></p>
+<p>所以，要掌握key值转换后的值，我们还需要知道 dword 和 string的值。至此，key就先分析到这。</p>
+<h2 id="0x03-关键函数sub-402BE0"><a href="#0x03-关键函数sub-402BE0" class="headerlink" title="0x03. 关键函数sub_402BE0"></a>0x03. 关键函数sub_402BE0</h2><p>做出最后结果的函数sub_402BE0的伪代码是：<br><img src="http://media.mrfan.today/f9cd82bcf5aa3e8046be2705379ace12.png" alt=""><br>这里的伪代码有点乱七八糟的，看起来不明所以。直接看汇编：<br><img src="http://media.mrfan.today/4f59a561d4023869d8b7228ed508265f.png" alt=""><br>这里sub_402BE0函数传的参分别对应ecx,edx,edi，edx即为key。红色框住的部分为函数的主要判断，从汇编代码中我们可一目了然地看到，主体部分在不断地从ecx和edx两个寄存器指向的内存地址中取出字符一位一位做对比，若存在不同之处，则返回失败。根据这段汇编代码，我们可初步猜测，这个函数为key和题目中暗藏的最后的密文做对比，若相同，则返回成功，同时也以此推断，第三个参数edi可能为key的长度。</p>
+<p>(PS: 所以很多时候还是看汇编靠谱啊…就是看的头疼了一点</p>
+<h2 id="0x04-是时候让IDA跑起来了！"><a href="#0x04-是时候让IDA跑起来了！" class="headerlink" title="0x04. 是时候让IDA跑起来了！"></a>0x04. 是时候让IDA跑起来了！</h2><p>静态分析得差不多了，走向最终胜利的流程图已分析出来，剩下的就是把我们还未解决的几个参数搞清楚。</p>
+<p>至此，走向胜利还需要知道几个参数的值：</p>
+<ol>
+<li>dword — 修改key</li>
+<li>string — 修改key</li>
+<li>v48-v19 –函数sub_402BE0参数，猜测为长度</li>
+<li>v34 –函数sub_402BE0参数，猜测为最后的密文</li>
+</ol>
+<p>dword位于bss区，程序在跑起来时会在某个函数处赋予它初值。静态分析扫了一下代码，发现生成或影响 string / v34参数值都没有用到Key参数，说明它们是独立于我们的输入的，应该为一个定值。</p>
+<p>那我们先跑起来~<br><img src="http://media.mrfan.today/0cc3c0a978339f1487ba034a42470689.png" alt=""><br>挂上debugger后，跑一下….诶？首长，它自杀了。。。进程自己关掉了，啥情况？？？<br>再细细排查了一下，发现一个神奇的函数：<br><img src="http://media.mrfan.today/9b2f04be5cf1ae3cb49bcb0117a26542.png" alt=""><br><img src="http://media.mrfan.today/04288e66881cf1af309a56582b6c5d12.png" alt=""><br>原来这还有一个坑，启动程序时检查进程里是否存在peid,idaq,ollydbg等进程，如果存在则退出进程。</p>
+<p>好吧，那我就把idaq改个名，就。。好了눈_눈</p>
+<p>终于跑起来了，我们通过动态调试，让程序自己生成我们想要的几个参数的值:<br><img src="http://media.mrfan.today/388315f7b2d064688a04a3649e02cc09.png" alt=""><br>打几个断点，记录下我们需要的值，可知</p>
+<p><strong>dword</strong>的初始值为 2</p>
+<p><strong>string</strong> 的值为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x62,0x39,0x62,0x37,0x64,0x64,0x31,0x63,0x34,0x32,0x31,0x65,0x30,0x30,0x35,0x62,0x63,0x39,0x61,0x37,0x66,0x37,0x30,0x62,0x38,0x34,0x38,0x65,0x33,0x64,0x30,0x65</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://media.mrfan.today/cc04008fa734a9e4fe8c44eac7c92e25.png" alt=""><br>在sub_402BE0函数里打断点，看到我们最后要的密文<strong>ciphertext</strong>为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x51,0x3C,0x0f,0x67,0x5c,0x2c,0x41,0x53,0x6a,0x49,0x70,0x51,0x68,0x54,0x2b,0x23,0x5b,0x64,0x0e,0x60,0x6a,0x43,0x69,0x46,0x69,0x0c,0x25,0x41,0x72,0x44,0x16,0x72</span><br></pre></td></tr></table></figure></p>
+<p>同时也在函数中确认了第三个参数的确为Key的长度。再多重新跑程序输入不同的key值，动态调试中发现string,dword和ciphertext并没有改变，说明之前分析出来的结论，它们的值与输入独立不相关是正确的。</p>
+<p>至此我们离胜利只有一步之遥。</p>
+<h2 id="0x05-胜利"><a href="#0x05-胜利" class="headerlink" title="0x05. 胜利"></a>0x05. 胜利</h2><p>总结一下，这个程序先对name做判断，若不为nsfocus，则退出进程。</p>
+<p>运行时，通过几个函数生成string 和最后的ciphertext （不是个constant string），并和输入的key进行异或和重新赋值。这个重新赋值的过程类似于CBC (Cipher Block Chaining ):</p>
+<p>输入key为”ABCDEFGHIJK”时，得到key变换过程：<br><img src="http://media.mrfan.today/107b69da56dbac86a4769fdf3b20322e.png" alt=""><br>这类似于CBC block加密的方法即是这里Key的转换过程。为了拿到flag,我们需要一个能转换为指定的ciphertext的一个key值，即根据ciphertext,由以上的类CBC加密结构，解密出key的值。</p>
+<p>这里用一个python脚本来进行计算：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># nomoney的循环字符串</span></span><br><span class="line">predefinedKey = [<span class="number">0x6e</span>,<span class="number">0x6f</span>,<span class="number">0x6d</span>,<span class="number">0x6f</span>,<span class="number">0x6e</span>,<span class="number">0x65</span>,<span class="number">0x79</span>,<span class="number">0x6e</span>,<span class="number">0x6f</span>,<span class="number">0x6d</span>,<span class="number">0x6f</span>,<span class="number">0x6e</span>,<span class="number">0x65</span>,<span class="number">0x79</span>,<span class="number">0x6e</span>,<span class="number">0x6f</span>,<span class="number">0x6d</span>,<span class="number">0x6f</span>,<span class="number">0x6e</span>,<span class="number">0x65</span>,<span class="number">0x79</span>,<span class="number">0x6e</span>,<span class="number">0x6f</span>,<span class="number">0x6d</span>,<span class="number">0x6f</span>,<span class="number">0x6e</span>,<span class="number">0x65</span>,<span class="number">0x79</span>,<span class="number">0x6e</span>,<span class="number">0x6f</span>,<span class="number">0x6d</span>,<span class="number">0x6f</span>]</span><br><span class="line"><span class="comment"># string</span></span><br><span class="line">string = [<span class="number">0x62</span>,<span class="number">0x39</span>,<span class="number">0x62</span>,<span class="number">0x37</span>,<span class="number">0x64</span>,<span class="number">0x64</span>,<span class="number">0x31</span>,<span class="number">0x63</span>,<span class="number">0x34</span>,<span class="number">0x32</span>,<span class="number">0x31</span>,<span class="number">0x65</span>,<span class="number">0x30</span>,<span class="number">0x30</span>,<span class="number">0x35</span>,<span class="number">0x62</span>,<span class="number">0x63</span>,<span class="number">0x39</span>,<span class="number">0x61</span>,<span class="number">0x37</span>,<span class="number">0x66</span>,<span class="number">0x37</span>,<span class="number">0x30</span>,<span class="number">0x62</span>,<span class="number">0x38</span>,<span class="number">0x34</span>,<span class="number">0x38</span>,<span class="number">0x65</span>,<span class="number">0x33</span>,<span class="number">0x64</span>,<span class="number">0x30</span>,<span class="number">0x65</span>]</span><br><span class="line"><span class="comment"># 将nomoney和string做预先的xor结果</span></span><br><span class="line">string2 = [predefinedKey[-(i+<span class="number">1</span>)]^string[i] <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,len(predefinedKey))]</span><br><span class="line"><span class="comment"># 最后要的密文</span></span><br><span class="line">ciphertext = [<span class="number">0x51</span>,<span class="number">0x3C</span>,<span class="number">0x0f</span>,<span class="number">0x67</span>,<span class="number">0x5c</span>,<span class="number">0x2c</span>,<span class="number">0x41</span>,<span class="number">0x53</span>,<span class="number">0x6a</span>,<span class="number">0x49</span>,<span class="number">0x70</span>,<span class="number">0x51</span>,<span class="number">0x68</span>,<span class="number">0x54</span>,<span class="number">0x2b</span>,<span class="number">0x23</span>,<span class="number">0x5b</span>,<span class="number">0x64</span>,<span class="number">0x0e</span>,<span class="number">0x60</span>,<span class="number">0x6a</span>,<span class="number">0x43</span>,<span class="number">0x69</span>,<span class="number">0x46</span>,<span class="number">0x69</span>,<span class="number">0x0c</span>,<span class="number">0x25</span>,<span class="number">0x41</span>,<span class="number">0x72</span>,<span class="number">0x44</span>,<span class="number">0x16</span>,<span class="number">0x72</span>]</span><br><span class="line"> </span><br><span class="line">result = []</span><br><span class="line">dword = <span class="number">0x02</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,len(ciphertext)):</span><br><span class="line">r = string2[i] ^ ciphertext[-(i+<span class="number">1</span>)] ^ dword</span><br><span class="line">dword = ciphertext[-(i+<span class="number">1</span>)]</span><br><span class="line">result.append(chr(r))</span><br><span class="line"> </span><br><span class="line">key = <span class="string">''</span>.join(result)</span><br><span class="line">key = key[::<span class="number">-1</span>]</span><br><span class="line">print(key)</span><br></pre></td></tr></table></figure></p>
+<p>这样就可以算出了最后的结果：<br><img src="http://media.mrfan.today/774df09ad212f1e638b181e85b3f3f4b.png" alt=""></p>
+
+    </article>
+    <!-- license  -->
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2018/10/23/【学习笔记】格式化字符串漏洞整理/" title="【学习笔记】格式化字符串漏洞整理">
+                    <div class="nextTitle">【学习笔记】格式化字符串漏洞整理</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:tweixiu@gmail.com" class="iconfont-archer email" title="email"></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x00-初探"><span class="toc-number">1.</span> <span class="toc-text">0x00. 初探</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x01-IDA起！找名字！"><span class="toc-number">2.</span> <span class="toc-text">0x01. IDA起！找名字！</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x02-IDA跑！找key啊喂"><span class="toc-number">3.</span> <span class="toc-text">0x02. IDA跑！找key啊喂</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x03-关键函数sub-402BE0"><span class="toc-number">4.</span> <span class="toc-text">0x03. 关键函数sub_402BE0</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x04-是时候让IDA跑起来了！"><span class="toc-number">5.</span> <span class="toc-text">0x04. 是时候让IDA跑起来了！</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x05-胜利"><span class="toc-number">6.</span> <span class="toc-text">0x05. 胜利</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 2
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/23</span><a class="archive-post-title" href="/2018/10/23/【学习笔记】格式化字符串漏洞整理/">【学习笔记】格式化字符串漏洞整理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/26</span><a class="archive-post-title" href="/2018/07/26/【Reverse】某CTF在线培训平台Reverse题/">【Reverse】某CTF在线培训平台Reverse题</a>
+        </li>
+    
+    </ul></div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="学习笔记"><span class="iconfont-archer">&#xe606;</span>学习笔记</span>
+    
+        <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
+    
+        <span class="sidebar-tag-name" data-tags="centOS - tomcat"><span class="iconfont-archer">&#xe606;</span>centOS - tomcat</span>
+    
+        <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
+    
+        <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br>
+    1、请确保node版本大于6.2<br>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Fanxs"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
