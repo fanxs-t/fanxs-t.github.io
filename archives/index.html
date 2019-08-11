@@ -19,7 +19,7 @@
     
     <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
     
-    <meta name="description" content="Just a blog.">
+    <meta name="description" content="Fire at the hole.">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Mrfan&#39;s Room.</title>
@@ -346,9 +346,79 @@
     
     
     <article class="index-post">
+        <a class="abstract-title" href="/2019/07/28/记一次APP加密通信后的分析过程/">
+            
+                <span>记一次APP加密通信后的分析过程</span>
+        </a>
+        <div class="abstract-content">
+            
+前言：最近有一次驻场测试，需要对甲方开发的支付SDK进行测试。到了甲方公司，对方负责人只给了我们一个SDK demo APP和接口文档，其他啥都没有给。让人崩溃的是，Demo里出来的通信过程是加密的，所有接口也是进行加密通信，而负责人并没有给我们报文的加密过程。这篇文章就记录了这一次测试的坎坷分析经历，以供自己以后再做参考。
+
+0x00.Demo报文甲方爸爸给我们的接口文档，包含了十几个不同的接口。接口共用几个URL，由请求包中的TransId来注明不同的接口服务。而文档里只给了参数的定义，没有发包的加密过程：Demo APP打开后，有一个输入框和“支付”按钮：输入框里的内容为接口明文...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/07/28</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class="abstract-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Android">Android</a>
+    
+</div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href="/2018/10/29/【整理笔记】Android APP基础安全测试/">
+            
+                <span>【整理笔记】Android APP基础安全测试</span>
+        </a>
+        <div class="abstract-content">
+            
+前言：在公司时，会接到很多APP的测试项目，其中就包括移动端安全的基本测试。由于本人对移动端安全没有很多的研究，在单独做这些项目时会遇到很多的困难，所以专门总结了这篇文章，以供自己测试需要。大佬请提出建议或有效避让。
+
+客户端安全签名安全检测目的检测客户端安装包是否正确签名。通过签名，可以检测出安装包在签名后是否被修改过。
+方法1.查看META-INF目录下的文件，若存在.SF和.RSA文件，则说明APP已经过了签名。2.利用GetApkInfo.jar，查看是否使用v2.0签名机制。
+检测详情使用GetAPKInfo:
+修复建议使用v1.0 + v2.0对APP进行签名。
+相关背景开...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/10/29</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class="abstract-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="整理笔记">整理笔记</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Android">Android</a>
+    
+</div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
         <a class="abstract-title" href="/2018/10/23/【整理笔记】格式化字符串漏洞梳理/">
             
-                <span>【学习笔记】格式化字符串漏洞整理</span>
+                <span>【整理笔记】格式化字符串漏洞梳理</span>
         </a>
         <div class="abstract-content">
             
@@ -366,7 +436,7 @@
             
             <div class="abstract-tags">
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="学习笔记">学习笔记</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="整理笔记">整理笔记</a>
     
         <a class="post-tag" href="javascript:void(0);" data-tags="二进制">二进制</a>
     
@@ -516,9 +586,27 @@
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 2
+        Total : 4
         </div>
         <!-- search  -->
         
@@ -529,12 +617,31 @@
     
     
     
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/28</span><a class="archive-post-title" href="/2019/07/28/记一次APP加密通信后的分析过程/">记一次APP加密通信后的分析过程</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
     <div class="archive-year"> 2018 </div>
     <ul class="year-list">
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">10/23</span><a class="archive-post-title" href="/2018/10/23/【整理笔记】格式化字符串漏洞梳理/">【学习笔记】格式化字符串漏洞整理</a>
+            <span class="archive-post-date">10/29</span><a class="archive-post-title" href="/2018/10/29/【整理笔记】Android APP基础安全测试/">【整理笔记】Android APP基础安全测试</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/23</span><a class="archive-post-title" href="/2018/10/23/【整理笔记】格式化字符串漏洞梳理/">【整理笔记】格式化字符串漏洞梳理</a>
         </li>
     
     
@@ -547,11 +654,13 @@
         <div class="sidebar-panel-tags">
     <div class="sidebar-tags-name">
     
+        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
+    
+        <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
+    
         <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
     
         <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
-    
-        <span class="sidebar-tag-name" data-tags="学习笔记"><span class="iconfont-archer">&#xe606;</span>学习笔记</span>
     
         <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
     
@@ -587,6 +696,8 @@ jsonContent:
 </div>
         <div class="sidebar-panel-categories">
     <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
     
         <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
     

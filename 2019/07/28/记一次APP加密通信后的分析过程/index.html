@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Fanxs">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Fanxs">
+    
+    <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="Fire at the hole.">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>记一次APP加密通信后的分析过程 · Mrfan&#39;s Room.</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/bm.png">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin="">
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin="">
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Mrfan&#39;s Room.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">记一次APP加密通信后的分析过程</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href="/">Mrfan's Room.</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="
+
+
+
+
+
+
+
+height:50vh;
+">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(https://source.unsplash.com/1600x900/?macbook)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            记一次APP加密通信后的分析过程
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Android">Android</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">3.7k</span>阅读时长: <span class="post-count reading-time">14 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/07/28</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <blockquote>
+<p>前言：<br>最近有一次驻场测试，需要对甲方开发的支付SDK进行测试。到了甲方公司，对方负责人只给了我们一个SDK demo APP和接口文档，其他啥都没有给。让人崩溃的是，Demo里出来的通信过程是加密的，所有接口也是进行加密通信，而负责人并没有给我们报文的加密过程。这篇文章就记录了这一次测试的坎坷分析经历，以供自己以后再做参考。</p>
+</blockquote>
+<h2 id="0x00-Demo报文"><a href="#0x00-Demo报文" class="headerlink" title="0x00.Demo报文"></a>0x00.Demo报文</h2><p>甲方爸爸给我们的接口文档，包含了十几个不同的接口。接口共用几个URL，由请求包中的TransId来注明不同的接口服务。<br>而文档里只给了参数的定义，没有发包的加密过程：<br><img src="http://148.70.228.11/upload/7bea45d9cc654fb2de39defb2576bcf8.png" alt=""><br>Demo APP打开后，有一个输入框和“支付”按钮：<br><img src="http://148.70.228.11/upload/4d2dfba425a82c675232947db4520dd6.png" alt=""><br>输入框里的内容为接口明文报文的base64:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;MerchantId&quot;:&quot;1000000000000000001&quot;,&quot;TransAmt&quot;:&quot;39.09&quot;,&quot;MerchantSeqNo&quot;:&quot;1551944989458&quot;,&quot;MerchantDate&quot;:&quot;20190307&quot;,&quot;MerchantTime&quot;:&quot;203718&quot;,&quot;Currency&quot;:&quot;CNY&quot;,&quot;FrontUrl&quot;:&quot;http://www.baidu.com&quot;,&quot;BackUrl&quot;:&quot;http://10.1.193.48:7001/gwback/weixin&quot;,&quot;PortFlag&quot;:&quot;0&quot;,&quot;OrderInfo&quot;:&quot;[&#123;\&quot;OrderTime\&quot;:\&quot;201115\&quot;,\&quot;OrderAmt\&quot;:\&quot;39.09\&quot;,\&quot;OrderBody\&quot;:\&quot;&quot;,\&quot;OrderId\&quot;:\&quot;15519449894580001\&quot;,\&quot;OrderSubject\&quot;:\&quot;&quot;,\&quot;OrderDate\&quot;:\&quot;20190307\&quot;&#125;]&quot;,&quot;Body&quot;:&quot;&quot;,&quot;Subject&quot;:&quot;Payment&quot;,&quot;sign&quot;:&quot;YPRhN2pn+sZKEwbepdzoy+M15YG60lEFmClVlYrVFT1TZ/c+qH0vUVHmfbI9JGGFeTVvUtBeD5IIYyJgvna4T5ekwM/8uv2N7cuUp/h9SmzDLOjqCu05kz5T5bsKGZT7s2DXgeiScqEn5YlpVAL7oXjH3/Sf+r7vuQlwAx5NSPc=&quot;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>发出的请求是这样的：<br><img src="http://148.70.228.11/upload/7882719e77d428ec9112e65be53925de.png" alt=""><br>尝试base64解密后，都是不知其意的字节码，可知整个报文是经过加密的。和甲方负责人确认后，可知支付按钮发出的请求是下单的接口，此接口定义为：<br><img src="http://148.70.228.11/upload/765b7ce35703af391bbd559d96b3fc1a.png" alt=""><br>接口定义和base64解码后的原文根本不对应啊，而且用这个Demo只能测试下单一个接口，其他十几个接口只能通过burp造请求包来测试。这时测试的首要问题，就是要知道该如何加密请求包。</p>
+<p>要搞清楚这一点，我就要知道：</p>
+<ol>
+<li>加密前的原报文是什么样（内容、格式）</li>
+<li>加密的方法是什么</li>
+<li>实现加密</li>
+</ol>
+<h2 id="0x01-逆向Demo"><a href="#0x01-逆向Demo" class="headerlink" title="0x01. 逆向Demo"></a>0x01. 逆向Demo</h2><p>为了知道加密方法，先逆向demo app。打开dex后，发现demo被混淆了：<br><img src="http://148.70.228.11/upload/ab32a1104409897c6612f52838b3d7a9.png" alt=""><br>心情是崩溃的，连给我们驻场测试的demo都是混淆的，图啥呢。。搜索请求包里的参数“data”，找到了这一个类：<br><img src="http://148.70.228.11/upload/60c4be78aa792495b7b83fea263d62ad.png" alt=""><br><img src="http://148.70.228.11/upload/398c12f5fae8534242249673bf189df4.png" alt=""><br>非常明显，这个类负责构造请求包参数并发出请求，此处调用了telecomAesDecrypt做加密。这个方法在类PEJniLib中：<br><img src="http://148.70.228.11/upload/f78c24b96e1b44346b9d66a7121a6d87.png" alt=""><br>这个类中用System.loadLibrary加载了一个so文件，并声明了相关的方法。telecomAesDecrypt函数调用了so文件中的native method进行具体的加密。</p>
+<h2 id="0x02-逆向So"><a href="#0x02-逆向So" class="headerlink" title="0x02.逆向So"></a>0x02.逆向So</h2><p>可见telecomAesDecrypt具体调用的native方法是getNativeValue(s, s2)。在java代码中调用具体的native方法时，需要在so文件中以固定命名规则定义相应的函数。根据官方文档，命名规则为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Dynamic linkers resolve entries based on their names. A native method name is concatenated from the following components:</span><br><span class="line"></span><br><span class="line">*   the prefix `Java_`</span><br><span class="line">*   a mangled fully-qualified class name</span><br><span class="line">*   an underscore (`_`) separator</span><br><span class="line">*   a mangled method name</span><br><span class="line">*   for overloaded native methods, two underscores (`__`) followed by the mangled argument signature</span><br></pre></td></tr></table></figure></p>
+<p>所以这里的getNativeValue在so文件中应该会命名为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Java_package_PEJniLib_getNativeValue(JNIEnv *env, jobject obj, jstring s ,jstring s2)</span><br></pre></td></tr></table></figure></p>
+<p>打开ida，对so文件进行逆向。在Export窗口搜索“java”：<br><img src="http://148.70.228.11/upload/5d7c274745f142c7f9bce85f41b078dd.png" alt=""><br>竟然没有以Java开头的函数。这时又懵逼了，不以固定的命名规则来定义函数，Java VM怎么能调用到正确的函数？后来查了很多的资料才发现，当时太年轻了，JNI接口的Native方法不仅仅能以固定的命名规则来进行定位（静态注册），还能通过加载so文件时的JNI_Onload函数进行 <em>动态注册</em> ，当然这是后话了。</p>
+<p>在Export里搜JNI：<br><img src="http://148.70.228.11/upload/a11354caabc9a50867c9247f76692704.png" alt=""><br>发现一个名称和目标 <em>getNativeValue(JNIEnv *env, jobject obj, jstring s ,jstring s2)</em> 匹配度非常高的函数getValues(_JNIEnv <em>,_jobject </em>,_jstring <em>,_jstring </em>)。它调用了其他的函数来进行加密，最后追述到进行具体加密的函数getValue(char <em>a1, char </em>a2):<br><img src="http://148.70.228.11/upload/90bf578bb974d4cd00f423abb0f3ff9d.png" alt=""><img src="http://148.70.228.11/upload/7cdbdaa70321e99e7b24f86527193121.png" alt=""><img src="http://148.70.228.11/upload/ec0ae99eac538873cf0f1cc7eca577d2.png" alt=""><br>因为这个so文件保留了符号表，可以很清晰地看出这里的函数做了什么。分析这个函数，可发现报文加密后会用“|”分成3个部分。第一部分是RSA加密的AES密钥，第二部分是AES加密报文串，第三部分是报文串MD5摘要值，每次加密都会随机生成AES密钥。</p>
+<p>再对比Demo发出的请求：<br><img src="http://148.70.228.11/upload/8c6759ba8eff6e8a4a92a344535f8f56.png" alt=""><br>因为base64字符表中并不包含“|”，所以加密后的报文的确由“|”分为了三部分。在so文件中看了其他函数后，并没有发现更合适的函数了，因此可断定了报文的加密方式。</p>
+<h2 id="0x03-动态调试so"><a href="#0x03-动态调试so" class="headerlink" title="0x03. 动态调试so"></a>0x03. 动态调试so</h2><p>知道了加密方式，解决了第2个问题。但还需要知道加密前的明文报文是什么样子的。因为APP的dex代码被混淆了，不高兴从dex里解决这个问题，所以我想到动态调试so文件。</p>
+<p>参考<a href="https://blog.csdn.net/lwanttowin/article/details/62042095" target="_blank" rel="noopener">使用IDA Pro动态调试SO文件</a>一文用真机进行动态调试：</p>
+<ol>
+<li>将手机插上电脑，启动android_server</li>
+<li>adb forward tcp:23946 tcp:23946</li>
+<li>am start -D -n com.example.test/com.example.test.MainActivity命令，启动所要调试的Activity</li>
+<li>启动ida pro，点击”Debugger - &gt; Attach -&gt; Remote ArmLinux/Android debugger“，port 23946，在弹出的”Choose process to attach to”窗口中找到应用进程</li>
+<li>打开DDMS，找到要调试应用的端口，通常为8700或8600</li>
+<li>jdb -connect com.sun.jdi.SocketAttach:port=8700,hostname=localhost</li>
+<li>IDA点击执行，函数打断点，开始动态调试。</li>
+</ol>
+<p>在调试过程中，遇到一些问题：</p>
+<ol>
+<li>IDA里的调试器不能选错，必须是Remote ArmLinux/Android debugger</li>
+<li>在第5步中，打开DDMS看不到任何应用的端口。</li>
+</ol>
+<p>要进行第6步，就必须要知道应用端口，这个只能通过DDMS来获取。但DDMS打开来看不到任何应用的端口，这个问题愁了我好久，后来才发现答案：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">DDMS中看不到进程，是因为它只能显示可调试debuggable=true的进程信息。要调试一个apk里面的dex代码，必须满足以下两个条件中的任何一个:</span><br><span class="line">· APP的AndroidManifest.xml文件必须设置属性android:debuggable=&quot;true&quot;，设置为可调试。</span><br><span class="line">· 系统/default.prop中ro.debuggable的值为1</span><br></pre></td></tr></table></figure></p>
+<p>而这个demo APP并没有设置为可调试。解决方法有：</p>
+<ol>
+<li>用apktools进行APP重打包，修改Manifest文件，加上可调试属性。</li>
+<li>Hook  system  debug<br>(用xposed的插件Xinstaller/BuildProp，都可以做到， Xposed插件Xinstaller，打开“专家模式”和“调试应用，或BuildProp设置ro.debuggable=1）</li>
+<li>修改底层系统的boot.img，设置/default.prop中ro.debuggable=1，再刷机</li>
+<li>用mprop进行hook,设置应用为可调试</li>
+</ol>
+<p>由于我的安卓测试机已经root了，所以我使用了最简单的第二个方法，在Xposed框架支持下安装了BuildProp，设置为ro.debuggable=1即可。附上链接：<a href="https://repo.xposed.info/module/com.jecelyin.buildprop" target="_blank" rel="noopener">BuildProp</a></p>
+<p>整好BuildProp，拿到端口后，终于可以进行动态调试。但在IDA中点击运行后，并没有停在设置好的断点上，出现了不明的原因，所以动态调试就算失败了。</p>
+<h2 id="0x04-TraceView和Frida"><a href="#0x04-TraceView和Frida" class="headerlink" title="0x04. TraceView和Frida"></a>0x04. TraceView和Frida</h2><p>动态调试so文件失败了，还是没有解决构造加密前报文的问题。所以想到了另一条路，用Frida进行java层的hook。</p>
+<p>之前我涛哥和震哥在破解一个加壳APP的通信加密算法时，用Frida来进行了加密类初始化函数的hook，找到了密钥，用TraceView来猜测到加密类初始化的函数。本着学习的目的，虽然前面已通过逆向APP来找到hook的函数，但我也用TraceView来进行了尝试。</p>
+<p>TraceView配合Frida,具体可参考：</p>
+<ul>
+<li><a href="https://la0s.github.io/2018/06/21/frida/" target="_blank" rel="noopener">使用Frida框架进行hook</a></li>
+<li><a href="https://la0s.github.io/2018/07/07/frida2/" target="_blank" rel="noopener">Frida后记——看我是怎么不用脱壳&amp;逆向来解密APP的数据</a></li>
+</ul>
+<h3 id="TraceView"><a href="#TraceView" class="headerlink" title="TraceView"></a>TraceView</h3><p><em><strong>Traceview</strong></em> 工具是Android SDK中自带的工具，用于分析APP的计算性能，可以对安卓进程进行trace分析，通过图形化的方式展示要跟踪的程序的性能，并且能具体到方法。_</p>
+<ol>
+<li><p>打开DDMS，在窗口中选中要监控的进程后，点击<strong>Start Method Profiling</strong>，开始对进程函数调用的监控：<br><img src="http://148.70.228.11/upload/5e0a3619dd6279044b07e4a858d58bdb.png" alt=""></p>
+</li>
+<li><p>在APP中进行操作。在Demo APP中点击按钮，发送请求。此时会经过一系列的函数调用，包含了报文初始化、报文加密、请求发送等过程。这些函数调用都已被Traceview所记录。</p>
+</li>
+<li><p>点击<strong>Stop Method Profiling</strong>，停止记录。这时TraceView显示了监控期间的函数调用情况：<br><img src="http://148.70.228.11/upload/9383fd3250f625ebfecc18eb6310c5b0.png" alt=""></p>
+</li>
+<li><p>分析监控期间的函数调用。在方法调用最密集的时候，应该就是一连串的方法调用来发出了请求。这时需要根据调用函数的 <em>参数类型，参数个数，返回值类型</em> 来进行猜测哪一个函数可能参与了加密过程。<img src="http://148.70.228.11/upload/495285bf7bc354b83e09ed6e88ebe08d.png" alt=""></p>
+</li>
+</ol>
+<p>当通信加密的APP被加壳或严重混淆时，TraceView可协助猜测加密类和加密函数，以便下一步Frida进行Hook。</p>
+<p><em>此前我涛哥和震哥，在面对通信加密的加壳APP时，搜到了测试APP未加壳时的老版本，找到了里面的加密函数和加密类，再结合TraceView成功猜测到了新版本APP里的加密方法的类名和函数名，最后用Frida Hook出了被修改的密钥。这是个非常有趣的思路。</em></p>
+<h3 id="Frida"><a href="#Frida" class="headerlink" title="Frida"></a>Frida</h3><p><em><strong>Frida</strong></em> 是一款基于Python和Javascript 的hook框架，可运行在Android，iOS，Linux，Win等各平台。Frida不仅可以用于hook java层，也可以进行native层的hook。利用Frida进行hook时，要求需要使用已ROOT的手机。</p>
+<p>根据逆向Demo APP和Traceview的结果，可知类PEJniLib的telecomAesEncrypt函数返回了明文报文的加密结果。所以用Frida Hook这个函数，就可以找到明文报文是啥格式。<br><img src="http://148.70.228.11/upload/0db99541ae53f7a9ce38b2bf02d6017a.png" alt=""><br><strong>telecomAesEncrypt:</strong></p>
+<ul>
+<li>2个参数</li>
+<li>参数类型都为 字符串</li>
+<li>返回值类型 字符串</li>
+</ul>
+<p>根据以上已知内容，写Frida Hook代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> frida, sys</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">on_message</span><span class="params">(message, data)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> message[<span class="string">'type'</span>] == <span class="string">'send'</span>:</span><br><span class="line">        print(<span class="string">"[*] &#123;0&#125;"</span>.format(message[<span class="string">'payload'</span>]))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(message)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Javascript代码中，在Java层对PEJniLib类的telecomAesEncrypt(String, String)方法进行了hook</span></span><br><span class="line"><span class="comment"># 打印出了此函数调用时的参数值</span></span><br><span class="line">jscode = <span class="string">"""</span></span><br><span class="line"><span class="string">Java.perform(function()&#123;</span></span><br><span class="line"><span class="string">    var Md5Util = Java.use("com.package.PEJniLib");</span></span><br><span class="line"><span class="string">    Md5Util.telecomAesEncrypt.overload('java.lang.String','java.lang.String').implementation=function(p1,p2)&#123;</span></span><br><span class="line"><span class="string">        console.log(p1);</span></span><br><span class="line"><span class="string">        console.log(p2);      </span></span><br><span class="line"><span class="string">        return this.telecomAesEncrypt(p1,p2);</span></span><br><span class="line"><span class="string">    &#125;;</span></span><br><span class="line"><span class="string">&#125;);</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取frida-server目标设备，和目标APP的进程pid</span></span><br><span class="line">device = frida.get_device_manager().enumerate_devices()[<span class="number">-1</span>]</span><br><span class="line">pid = device.spawn([<span class="string">"com.package"</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 附加到目标APP上，创建一个Session</span></span><br><span class="line"><span class="comment"># Session可以理解为一次会话，比如附加到某个进程则算是启动了一次会话，也可以理解为进程的抽象</span></span><br><span class="line">session = device.attach(pid)</span><br><span class="line">print(<span class="string">"[*] Attach Application id:"</span>,pid)</span><br><span class="line"><span class="comment"># 让应用恢复运行</span></span><br><span class="line">device.resume(pid)</span><br><span class="line">print(<span class="string">"[*] Application onResume"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据参数字符串创建一个Scritp对象，参数里的js脚本会被加载到目标进程中</span></span><br><span class="line">script = session.create_script(jscode)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在监听到一个message时，执行on_message函数</span></span><br><span class="line"><span class="comment"># 此处的message为一个Javascript对象，为Javascript和Python之间沟通的基本消息类，有type和payload属性</span></span><br><span class="line"><span class="comment"># 比如，Javascript代码报错时，会传出type为error的message,其中的payload就为报错信息</span></span><br><span class="line"><span class="comment"># 打印出message: &#123;'type':  'error',  'description':  'ReferenceError: a is not defined',  u'lineNumber':  1&#125;</span></span><br><span class="line">script.on(<span class="string">'message'</span>, on_message)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载代码</span></span><br><span class="line">script.load()</span><br><span class="line">sys.stdin.read()</span><br></pre></td></tr></table></figure></p>
+<p>将代码执行，成功地输出了明文报文和密钥：<br><img src="http://148.70.228.11/upload/75237bb6042d5904b3d1c50720c09ea0.png" alt=""></p>
+<h2 id="0x05-实现加密"><a href="#0x05-实现加密" class="headerlink" title="0x05. 实现加密"></a>0x05. 实现加密</h2><p>已知<strong>明文报文</strong>和<strong>加密方式</strong>，接下来就只剩下实现加密算法，来进行之后的测试。一开始的想法是，既然我都有了具体的加密算法，那就直接写代码实现就好了。由于只能在甲方的内网机器上进行测试，机器上没有python环境和依赖库，所以只能编写java代码。</p>
+<p>在写了2天的Java代码后，遇到了2个大坑：</p>
+<ol>
+<li>由于不熟悉Java开发，所以写代码的效率很低</li>
+<li>Java库不同导致加密错误。内网机器上没有常用的库，如apache。我用一些基本库写完了加密实现后，发现加密结果永远都不对。后来和甲方的开发求助，对接了一下代码，才发现同样的明文，我们用了不一样的库，base64的结果就已经不一样了。</li>
+</ol>
+<p>以上的坑导致我心态崩了，本来就不会java，驻场时间紧，得硬着头上还撞到了墙。这时我就不想搞了，换了个思路。<em>既然我都知道明文报文的格式了，那何不直接写一个APP调用so文件来进行加密</em>。</p>
+<p>编写APP调用已有的so文件，需要：</p>
+<ol>
+<li>打开Android Studio新建一个Project，并第一步勾选Include C++ support:</li>
+<li>在项目文件夹下，建立libs文件，并将so文件的不同系统的实现都放进去libs中。<br><img src="http://148.70.228.11/upload/679fd40f23ad66365a22d956e0964f08.png" alt=""></li>
+<li>在项目的gradle中添加这一项：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sourceSets&#123;</span><br><span class="line">   main&#123;</span><br><span class="line">       jniLibs.srcDirs = [&apos;libs&apos;]</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="http://148.70.228.11/upload/d24623f14bfe5c7a5a9d11809b5d2053.png" alt=""></p>
+<p>然后就可以开始编写APP的功能了。APP的layout简单地放了输入框和加解密按钮：<br><img src="http://148.70.228.11/upload/d648bb2c7fcbc2360a46f2f98a39f3f2.png" alt=""></p>
+<p>定义一个PEJniLib类，声明了Native方法，此处需要package名和class名严格和so文件中对应。由于动态注册，在编译时会提醒Native方法无法解析，但依然能成功build app：<br><img src="http://148.70.228.11/upload/337aad1b038a37f41dd7de6e7f1086d3.png" alt=""><br>这里需要注意的是，类名必须是”PEJniLib“，否则会提醒找不到类。估摸着应该是动态注册时绑定了这一个类名。</p>
+<p>MainActivity中则简单地将输入框的内容，传到PEJniLib的响应Native类中，进行加解密：<br><img src="http://148.70.228.11/upload/271243998bbb952c7ae9c5cef80feffe.png" alt=""></p>
+<p>至此，相关接口测试时的通信加解密问题，就解决了。这一篇文章，也旨在做一次记录，以供以后遇到相关问题时再做参考。</p>
+<p>以下是在完成了这次驻场测试后，对动态注册Native方法的思考和研究。</p>
+<h2 id="0x06-JNI调用探索"><a href="#0x06-JNI调用探索" class="headerlink" title="0x06.JNI调用探索"></a>0x06.JNI调用探索</h2><p>在完成了测试后，我在考虑2个问题：</p>
+<ol>
+<li>Native方法的动态注册，究竟是怎么样的一个过程</li>
+<li>在上文中，so文件保留了符号表，所以IDA逆向后能看到原始的函数名，因此我才猜测到了目标getValues方法。若如果so文件加壳了，仅仅知道Java VM调用的Native方法是getNativeValue，怎么在so文件中找到相应的函数呢？或有没有更方便的方法定位so库里的方法。</li>
+</ol>
+<p>简单地说，动态注册是怎么实现的？若Native方法是动态注册的，要怎么来定位呢？基于自己不懂Android开发，就自己探索了一下JNI，记录在了下一篇文章里。</p>
+
+    </article>
+    <!-- license  -->
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2018/10/29/【整理笔记】Android APP基础安全测试/" title="【整理笔记】Android APP基础安全测试">
+                    <div class="prevTitle">【整理笔记】Android APP基础安全测试</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:tweixiu@gmail.com" class="iconfont-archer email" title="email"></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x00-Demo报文"><span class="toc-number">1.</span> <span class="toc-text">0x00.Demo报文</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x01-逆向Demo"><span class="toc-number">2.</span> <span class="toc-text">0x01. 逆向Demo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x02-逆向So"><span class="toc-number">3.</span> <span class="toc-text">0x02.逆向So</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x03-动态调试so"><span class="toc-number">4.</span> <span class="toc-text">0x03. 动态调试so</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x04-TraceView和Frida"><span class="toc-number">5.</span> <span class="toc-text">0x04. TraceView和Frida</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TraceView"><span class="toc-number">5.1.</span> <span class="toc-text">TraceView</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Frida"><span class="toc-number">5.2.</span> <span class="toc-text">Frida</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x05-实现加密"><span class="toc-number">6.</span> <span class="toc-text">0x05. 实现加密</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x06-JNI调用探索"><span class="toc-number">7.</span> <span class="toc-text">0x06.JNI调用探索</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 4
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/28</span><a class="archive-post-title" href="/2019/07/28/记一次APP加密通信后的分析过程/">记一次APP加密通信后的分析过程</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/29</span><a class="archive-post-title" href="/2018/10/29/【整理笔记】Android APP基础安全测试/">【整理笔记】Android APP基础安全测试</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/23</span><a class="archive-post-title" href="/2018/10/23/【整理笔记】格式化字符串漏洞梳理/">【整理笔记】格式化字符串漏洞梳理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/26</span><a class="archive-post-title" href="/2018/07/26/【Reverse】某CTF在线培训平台Reverse题/">【Reverse】某CTF在线培训平台Reverse题</a>
+        </li>
+    
+    </ul></div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
+    
+        <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
+    
+        <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
+    
+        <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
+    
+        <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br>
+    1、请确保node版本大于6.2<br>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
+    
+        <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
+    
+        <span class="sidebar-category-name" data-categories="二进制"><span class="iconfont-archer">&#xe60a;</span>二进制</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Fanxs"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
