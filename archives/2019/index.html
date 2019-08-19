@@ -346,6 +346,39 @@
     
     
     <article class="index-post">
+        <a class="abstract-title" href="/2019/08/19/JNI调用和动态注册探索/">
+            
+                <span>JNI调用和动态注册探索</span>
+        </a>
+        <div class="abstract-content">
+            
+前言：之前在测试一个APP时，需要自己去写一个APP调用so库来进行通信的加解密。由于so文件使用了动态注册，所以没能找到对应的Native加解密方法来进行分析。所以这一篇就自己探索一下JNI接口了调用so库的方法，以及如何发现和定位动态注册的JNI接口。
+
+0x00. JNI接口在Java中声明并调用了Native方法时，在运行时必须要让JVM找到对应的函数。Java层会通过JNI（Java Native Interface)来访问到Native层：1Java &lt;---&gt; JNI &lt;---&gt; Native
+Java代码调用Native函数，需要在类中加载so文...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/08/19</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class="abstract-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Android">Android</a>
+    
+</div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
         <a class="abstract-title" href="/2019/07/28/记一次APP加密通信后的分析过程/">
             
                 <span>记一次APP加密通信后的分析过程</span>
@@ -498,9 +531,20 @@
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 4
+        Total : 5
         </div>
         <!-- search  -->
         
@@ -513,6 +557,11 @@
     
     <div class="archive-year"> 2019 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/19</span><a class="archive-post-title" href="/2019/08/19/JNI调用和动态注册探索/">JNI调用和动态注册探索</a>
+        </li>
     
     
         <li class="archive-post-item">

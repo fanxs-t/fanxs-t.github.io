@@ -472,6 +472,15 @@ height:50vh;
 <li>返回值类型 字符串</li>
 </ul>
 <p>根据以上已知内容，写Frida Hook代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> frida, sys</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">on_message</span><span class="params">(message, data)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> message[<span class="string">'type'</span>] == <span class="string">'send'</span>:</span><br><span class="line">        print(<span class="string">"[*] &#123;0&#125;"</span>.format(message[<span class="string">'payload'</span>]))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(message)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Javascript代码中，在Java层对PEJniLib类的telecomAesEncrypt(String, String)方法进行了hook</span></span><br><span class="line"><span class="comment"># 打印出了此函数调用时的参数值</span></span><br><span class="line">jscode = <span class="string">"""</span></span><br><span class="line"><span class="string">Java.perform(function()&#123;</span></span><br><span class="line"><span class="string">    var Md5Util = Java.use("com.package.PEJniLib");</span></span><br><span class="line"><span class="string">    Md5Util.telecomAesEncrypt.overload('java.lang.String','java.lang.String').implementation=function(p1,p2)&#123;</span></span><br><span class="line"><span class="string">        console.log(p1);</span></span><br><span class="line"><span class="string">        console.log(p2);      </span></span><br><span class="line"><span class="string">        return this.telecomAesEncrypt(p1,p2);</span></span><br><span class="line"><span class="string">    &#125;;</span></span><br><span class="line"><span class="string">&#125;);</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取frida-server目标设备，和目标APP的进程pid</span></span><br><span class="line">device = frida.get_device_manager().enumerate_devices()[<span class="number">-1</span>]</span><br><span class="line">pid = device.spawn([<span class="string">"com.package"</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 附加到目标APP上，创建一个Session</span></span><br><span class="line"><span class="comment"># Session可以理解为一次会话，比如附加到某个进程则算是启动了一次会话，也可以理解为进程的抽象</span></span><br><span class="line">session = device.attach(pid)</span><br><span class="line">print(<span class="string">"[*] Attach Application id:"</span>,pid)</span><br><span class="line"><span class="comment"># 让应用恢复运行</span></span><br><span class="line">device.resume(pid)</span><br><span class="line">print(<span class="string">"[*] Application onResume"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据参数字符串创建一个Scritp对象，参数里的js脚本会被加载到目标进程中</span></span><br><span class="line">script = session.create_script(jscode)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在监听到一个message时，执行on_message函数</span></span><br><span class="line"><span class="comment"># 此处的message为一个Javascript对象，为Javascript和Python之间沟通的基本消息类，有type和payload属性</span></span><br><span class="line"><span class="comment"># 比如，Javascript代码报错时，会传出type为error的message,其中的payload就为报错信息</span></span><br><span class="line"><span class="comment"># 打印出message: &#123;'type':  'error',  'description':  'ReferenceError: a is not defined',  u'lineNumber':  1&#125;</span></span><br><span class="line">script.on(<span class="string">'message'</span>, on_message)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载代码</span></span><br><span class="line">script.load()</span><br><span class="line">sys.stdin.read()</span><br></pre></td></tr></table></figure></p>
+<p>启动frida:</p>
+<ol>
+<li>adb shell 后启动frida-server<br><img src="http://148.70.228.11/upload/667ced6aa4df8b23c908edc2538c2912.png" alt=""></li>
+<li><p>端口转发：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:27042 tcp:27042</span><br><span class="line">adb forward tcp:27043 tcp:27043</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果PC端frida-pc打出了进程，则说明连接正常：<br><img src="http://148.70.228.11/upload/aee85d6537710a1dcd9f5edd2f380029.png" alt=""></p>
+</li>
+</ol>
 <p>将代码执行，成功地输出了明文报文和密钥：<br><img src="http://148.70.228.11/upload/75237bb6042d5904b3d1c50720c09ea0.png" alt=""></p>
 <h2 id="0x05-实现加密"><a href="#0x05-实现加密" class="headerlink" title="0x05. 实现加密"></a>0x05. 实现加密</h2><p>已知<strong>明文报文</strong>和<strong>加密方式</strong>，接下来就只剩下实现加密算法，来进行之后的测试。一开始的想法是，既然我都有了具体的加密算法，那就直接写代码实现就好了。由于只能在甲方的内网机器上进行测试，机器上没有python环境和依赖库，所以只能编写java代码。</p>
 <p>在写了2天的Java代码后，遇到了2个大坑：</p>
@@ -506,6 +515,11 @@ height:50vh;
     <!-- paginator  -->
     <ul class="post-paginator">
         <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2019/08/19/JNI调用和动态注册探索/" title="JNI调用和动态注册探索">
+                    <div class="nextTitle">JNI调用和动态注册探索</div>
+                </a>
             
         </li>
         <li class="previous">
@@ -673,9 +687,20 @@ top:50vh;
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 4
+        Total : 5
         </div>
         <!-- search  -->
         
@@ -688,6 +713,11 @@ top:50vh;
     
     <div class="archive-year"> 2019 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/19</span><a class="archive-post-title" href="/2019/08/19/JNI调用和动态注册探索/">JNI调用和动态注册探索</a>
+        </li>
     
     
         <li class="archive-post-item">

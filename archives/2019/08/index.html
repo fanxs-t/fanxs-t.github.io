@@ -346,100 +346,27 @@
     
     
     <article class="index-post">
-        <a class="abstract-title" href="/2018/10/29/【整理笔记】Android APP基础安全测试/">
+        <a class="abstract-title" href="/2019/08/19/JNI调用和动态注册探索/">
             
-                <span>【整理笔记】Android APP基础安全测试</span>
+                <span>JNI调用和动态注册探索</span>
         </a>
         <div class="abstract-content">
             
-前言：在公司时，会接到很多APP的测试项目，其中就包括移动端安全的基本测试。由于本人对移动端安全没有很多的研究，在单独做这些项目时会遇到很多的困难，所以专门总结了这篇文章，以供自己测试需要。大佬请提出建议或有效避让。
+前言：之前在测试一个APP时，需要自己去写一个APP调用so库来进行通信的加解密。由于so文件使用了动态注册，所以没能找到对应的Native加解密方法来进行分析。所以这一篇就自己探索一下JNI接口了调用so库的方法，以及如何发现和定位动态注册的JNI接口。
 
-客户端安全签名安全检测目的检测客户端安装包是否正确签名。通过签名，可以检测出安装包在签名后是否被修改过。
-方法1.查看META-INF目录下的文件，若存在.SF和.RSA文件，则说明APP已经过了签名。2.利用GetApkInfo.jar，查看是否使用v2.0签名机制。
-检测详情使用GetAPKInfo:
-修复建议使用v1.0 + v2.0对APP进行签名。
-相关背景开...
+0x00. JNI接口在Java中声明并调用了Native方法时，在运行时必须要让JVM找到对应的函数。Java层会通过JNI（Java Native Interface)来访问到Native层：1Java &lt;---&gt; JNI &lt;---&gt; Native
+Java代码调用Native函数，需要在类中加载so文...
         </div>
         <div class="abstract-post-meta">
             <!-- date  -->
             <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/10/29</span>
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/08/19</span>
             </div>
             <!-- tags  -->
             
             <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="整理笔记">整理笔记</a>
     
         <a class="post-tag" href="javascript:void(0);" data-tags="Android">Android</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/10/23/【整理笔记】格式化字符串漏洞梳理/">
-            
-                <span>【整理笔记】格式化字符串漏洞梳理</span>
-        </a>
-        <div class="abstract-content">
-            
-前言：格式化字符串漏洞是比较古老的漏洞了，已经被研究了好多年，在目前广泛的ASLR和vsprintf/vprintf等新函数的保护下，这个漏洞也已经不常见。写这个只是因为，在之前读书时，专门读了这个漏洞的文章，想想当时学的那么认真，没有做啥整理就忘光了有点可惜，所以就重新复习了一下做一下学习整理。
-
-0. 简介格式化字符串漏洞是广泛存在于基于C/C++的可执行文件中的漏洞，于2000年被纰漏。这个漏洞是典型的二进制常见漏洞之一，它的危害甚至超过了缓冲区溢出。
-1. 原理格式化函数是一种特殊的ANSI C函数，它们从格式化字符串中提取参数，并对这些参数进行处理。而格式化字符串将C语言的主...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/10/23</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="整理笔记">整理笔记</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="二进制">二进制</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/07/26/【Reverse】某CTF在线培训平台Reverse题/">
-            
-                <span>【Reverse】某CTF在线培训平台Reverse题</span>
-        </a>
-        <div class="abstract-content">
-            这几天客户要参加一个CTF竞赛，据说是在一个CTF在线培训平台上抽题来做赛题，就让我们把题做了之后给他们培训CTF。这个平台里只有一道reverse的题，名字还是取了最近特别火的电影“我不是药神”之名（这电影巨好看，业界良心），这几天虽然忙着测一个智能设备，但还是抽出时间想来试试这道reverse题。
-0x00. 初探这道题为一个EXE文件，打开后需要输入名字和key来通关，如果输错了，则会“爆炸”。迫不及待打开了exe，瞎填了名字和key，想看看报错的语句是什么（方便后来ida里寻找）。
-刚输完名字，程序就关掉了……看来是只有输入了固定的名字，才能走到输入key那一步。好吧，那就直接I...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/07/26</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="CTF">CTF</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="逆向">逆向</a>
     
 </div>
             
