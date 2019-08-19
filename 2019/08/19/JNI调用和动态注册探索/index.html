@@ -439,7 +439,7 @@ height:50vh;
 <li>效率高。传统方式下，Java类call本地函数时，通常是依靠VM去动态寻找.so中的本地函数(因此它们才需要特定规则的命名格式)，而使用RegisterNatives将本地函数向VM进行登记，可以让其更有效率的找到函数； </li>
 <li>运行时动态调整本地函数与Java函数值之间的映射关系，只需要多次call RegisterNatives()方法，并传入不同的映射表参数即可。</li>
 </ol>
-<h2 id="0x03-搜查静态注册函数"><a href="#0x03-搜查静态注册函数" class="headerlink" title="0x03.  搜查静态注册函数"></a>0x03.  搜查静态注册函数</h2><p>++<em>现在要解决上一篇文章留下的问题：若如果so文件加壳或严重混淆了，仅仅知道Java VM调用的Native方法是getNativeValue，怎么在so文件中找到相应的函数呢？或有没有更方便的方法定位so库里的方法。</em>++</p>
+<h2 id="0x03-搜查静态注册函数"><a href="#0x03-搜查静态注册函数" class="headerlink" title="0x03.  搜查静态注册函数"></a>0x03.  搜查静态注册函数</h2><p><em>现在要解决上一篇文章留下的问题：若如果so文件加壳或严重混淆了，仅仅知道Java VM调用的Native方法是getNativeValue，怎么在so文件中找到相应的函数呢？或有没有更方便的方法定位so库里的方法。</em></p>
 <p>若调用第三方so时，调用者的package和class和so文件中不对应，就会报Runtime java.lang.UnsatisfiedLinkError错误。package或class名不正确时：<br><img src="http://148.70.228.11/upload/ceeaacbe77a4c313b0316ce4a7f6ce66.png" alt=""></p>
 <p>所以要调用第三方so库时，只需要在APP中定义正确的package/class和调用正确的method名，JVM就能找到对应的Native方法。如果我们只拿到一个so库，或者APP加固了无法看到调用这so时的package和class名，有多种方法可以找到这个package/class。</p>
 <p>若so库只用了静态注册，所有JNI方法都可以在.dynamic导出函数表里找到。在IDA反编译：<br><img src="http://148.70.228.11/upload/d63714246340be3474071f2369e96d49.png" alt=""><br>或者简单使用objdump:<br><img src="http://148.70.228.11/upload/819d70fa12ab9894cd474d25de57149a.png" alt=""><br>在方法名中就可以明显地看到package/class。</p>
