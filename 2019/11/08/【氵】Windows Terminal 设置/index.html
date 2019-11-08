@@ -409,7 +409,7 @@ height:50vh;
 <p>在窗口上方打开Settings就可以开始对WS的配置。按住Alt再点击<code>Settings</code>则会打开默认设置default.json<br><img src="http://148.70.228.11/upload/6172c130528b1632faaf3238e3106567.png" alt=""></p>
 <p>打开后可看到<code>profiles.json</code>的结构很简单，包含有globals配置，profiles，schemes和keybindings等。globals的配置涉及到终端的一些使用配置，可以不用做修改。要设置ws的展示样式，主要关注profiles/schemes两项。<br><img src="http://148.70.228.11/upload/0623632bb630249adfdc52a786cc9c59.png" alt=""></p>
 <h2 id="0x01-Profiles设置"><a href="#0x01-Profiles设置" class="headerlink" title="0x01. Profiles设置"></a>0x01. Profiles设置</h2><p>Profiles项主要用来做终端的基础设置，如背景、初始文件夹、光标、字体等。具体可参考链接<a href="https://github.com/microsoft/terminal/blob/master/doc/cascadia/SettingsSchema.md" target="_blank" rel="noopener">Profiles设置</a>。</p>
-<p>Profiles中可设置很多选项来达到不一样的视觉效果，以下为挑出来的，我认为有较大作用的：<br>| 设置项    | 作用   |<br>| ——— | ——– |<br>|backgroundImage|背景图片|<br>|backgroundImageAlignment|背景图片的对齐设置|<br>|backgroundImageOpacity|背景图片透明度|<br>|backgroundImageStretchMode|背景图片拉伸设置|<br>|colorScheme|使用的字体颜色方案|<br>|cursorColor|光标颜色|<br>|cursorShape|光标的形状<code>&quot;vintage&quot;</code> ( ▃ ), <code>&quot;bar&quot;</code> ( ┃ ), <code>&quot;underscore&quot;</code> ( ▁ ), <code>&quot;filledBox&quot;</code> ( █ ), <code>&quot;emptyBox&quot;</code> ( ▯ )|<br>|cursorHeight|光标的高度（仅当光标为vintage时生效）|<br>|fontFace|字体|<br>|fontSize|字体大小|<br>|historySize|可追述的历史记录数|<br>|icon|这个Tab显示的logo|<br>|padding|字体周围的padding，格式为“8, 8, 8, 8”|<br>|snapOnInput|设置为True时，在打字时会自动跳转到输入行|<br>|startingDirectory|开启终端时的目录|<br>|tabTitle|这个终端tab的名字|<br>|useAcrylic|亚克力背景，终端背景会像蒙着一层亚克力，半透明化|<br>|acrylicOpacity|设置亚克力背景透明度|<br>|foreground|前景颜色|<br>|background|背景颜色|</p>
+<p>Profiles中可设置很多选项来达到不一样的视觉效果，以下为挑出来的，我认为有较大作用的：<br>设置项|作用<br>—-|—<br>backgroundImage|背景图片<br>backgroundImageAlignment|背景图片的对齐设置<br>backgroundImageOpacity|背景图片透明度<br>backgroundImageStretchMode|背景图片拉伸设置<br>colorScheme|使用的字体颜色方案<br>cursorColor|光标颜色<br>cursorShape|光标的形状<code>&quot;vintage&quot;</code> ( ▃ ), <code>&quot;bar&quot;</code> ( ┃ ), <code>&quot;underscore&quot;</code> ( ▁ ), <code>&quot;filledBox&quot;</code> ( █ ), <code>&quot;emptyBox&quot;</code> ( ▯ )<br>cursorHeight|光标的高度（仅当光标为vintage时生效<br>fontFace|字体<br>fontSize|字体大小<br>historySize|可追述的历史记录数<br>icon|这个Tab显示的logo<br>padding|字体周围的padding，格式为“8, 8, 8, 8”<br>snapOnInput|设置为True时，在打字时会自动跳转到输入行<br>startingDirectory|开启终端时的目录<br>tabTitle|这个终端tab的名字<br>useAcrylic|亚克力背景，终端背景会像蒙着一层亚克力，半透明化<br>acrylicOpacity|设置亚克力背景透明度<br>foreground|前景颜色<br>background|背景颜色</p>
 <p>这里所谓的前景颜色<code>foreground</code>，会影响终端字体输出的颜色，而<code>background</code>则为终端背景的颜色，这两项建议直接在scheme中所设置，当然如果对这两项有个人喜好的话，可以在profiles中设置，会覆盖scheme中这两项的设置。</p>
 <h2 id="0x02-Profiles例子"><a href="#0x02-Profiles例子" class="headerlink" title="0x02. Profiles例子"></a>0x02. Profiles例子</h2><p>通过对<code>profiles</code>的设置，可以设置很多的效果，如设置background为图片：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;backgroundImage&quot; : &quot;C:/Wallpapers/秒速五厘米.png&quot;,</span><br><span class="line">&quot;backgroundImageOpacity&quot; : 0.8,</span><br></pre></td></tr></table></figure></p>
 <p><img src="http://148.70.228.11/upload/6d3feaa906ad0c0774961bd8eb034c38.png" alt=""><br>这里的backgroundImage支持很多URI协议，可以直接图片的网络地址：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;backgroundImage&quot; : &quot;https://example/1.jpg&quot;,</span><br></pre></td></tr></table></figure></p>
@@ -623,6 +623,8 @@ top:50vh;
     
     
     
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
         Total : 6
@@ -691,9 +693,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
     
-        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
-    
         <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
+    
+        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -732,9 +734,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
     
-        <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
-    
         <span class="sidebar-category-name" data-categories="二进制"><span class="iconfont-archer">&#xe60a;</span>二进制</span>
+    
+        <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
     
     </div>
     <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
