@@ -346,19 +346,29 @@
     
     
     <article class="index-post">
-        <a class="abstract-title" href="/2019/12/17/安卓测试之Hook SSL_read和SSL_write/">
+        <a class="abstract-title" href="/2019/12/16/安卓测试之Hook SSL_read和SSL_write/">
             
-                <span>[Untitled Post]</span>
+                <span>安卓测试之Hook SSL_read和SSL_write</span>
         </a>
         <div class="abstract-content">
             
+前言：这两周在群里和朋友们水群时，看到群友转发了一句别人的话：安卓APP抓双向认证的包釜底抽薪的一招就是hook ssl_read和ssl_write两个方法，完全不用配置代理，不用管APP客户端和服务端的证书校验问题。屡试不爽～～，感觉挺有趣的，就研究了一下，这篇文章只是一时兴起。
+
+0x00. 思路这里的思路是，hook SSL_read和SSL_write，就可以绕过APP客户端的证书校验等问题，直接窥探到HTTPS里的请求内容和响应。
+先了解一下这两个函数是干嘛的。根据SSL_read的介绍，SSL_read用于从已经建立的SSL session中读取数据，放入到缓冲区中。而S...
         </div>
         <div class="abstract-post-meta">
             <!-- date  -->
             <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/12/17</span>
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/12/16</span>
             </div>
             <!-- tags  -->
+            
+            <div class="abstract-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Android">Android</a>
+    
+</div>
             
         </div>
     </article>
@@ -616,6 +626,12 @@ Java代码调用Native函数，需要在类中加载so文...
     
     
     
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
         Total : 7
@@ -629,22 +645,13 @@ Java代码调用Native函数，需要在类中加载so文...
     
     
     
-    <div class="archive-year"> Invalid date </div>
+    <div class="archive-year"> 2019 </div>
     <ul class="year-list">
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">Invalid date</span><a class="archive-post-title" href="/2019/12/17/安卓测试之Hook SSL_read和SSL_write/">[Untitled Post]</a>
+            <span class="archive-post-date">12/16</span><a class="archive-post-title" href="/2019/12/16/安卓测试之Hook SSL_read和SSL_write/">安卓测试之Hook SSL_read和SSL_write</a>
         </li>
-    
-    
-    
-    
-    
-        </ul>
-    
-    <div class="archive-year"> 2019 </div>
-    <ul class="year-list">
     
     
         <li class="archive-post-item">
@@ -692,15 +699,15 @@ Java代码调用Native函数，需要在类中加载so文...
     
         <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
     
-        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
-    
-        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
-    
         <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
     
         <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
     
+        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
+    
         <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
+    
+        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -737,11 +744,11 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
     
-        <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
-    
         <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
     
         <span class="sidebar-category-name" data-categories="二进制"><span class="iconfont-archer">&#xe60a;</span>二进制</span>
+    
+        <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
     
     </div>
     <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
