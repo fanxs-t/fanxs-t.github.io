@@ -448,7 +448,7 @@ height:50vh;
 </tr>
 <tr>
 <td>cursorHeight</td>
-<td>光标的高度（仅当光标为vintage时生效</td>
+<td>光标的高度（仅当光标为vintage时生效)</td>
 </tr>
 <tr>
 <td>fontFace</td>
@@ -506,7 +506,7 @@ height:50vh;
 <p>background也可以设置为动图：<br><img src="https://www.appliedis.com/wp-content/uploads/2019/08/nyan.gif" alt=""></p>
 <p>不想使用背景图片时，可以使用单一颜色作背景。此时设置毛玻璃亚克力背景的效果，会出现半透明化：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;acrylicOpacity&quot; : 0.5,</span><br><span class="line">&quot;useAcrylic&quot; : true,</span><br></pre></td></tr></table></figure></p>
 <p><img src="http://148.70.228.11/upload/4b1fe05fa5284981443e3cb561bd2704.png" alt=""><br>然后还可以设置字体，字体大小等等，就不一一陈述。</p>
-<h2 id="0x03-Schemes设置"><a href="#0x03-Schemes设置" class="headerlink" title="0x03. Schemes设置"></a>0x03. Schemes设置</h2><p>Schemes项中，主要是设置终端字体的颜色。打开设置时，能看到schemes中的一个默认配色scheme:<br><img src="http://148.70.228.11/upload/34d504dcb1f9775dfa5bdee6aa143439.png" alt=""><br>这里的<code>foreground</code>和<code>background</code>为终端的前景和背景颜色。<code>colors</code>中对应的是<code>16-ANSI-color</code>。虽然不同终端（入Xterm,Putty,Ubuntu等）可以显示至少256种颜色，但是大部分终端都会采取16种颜色来做不同处字体的显示颜色，这就是所谓的<code>16-ANSI-color</code>方案。以下图片显示了针对这16-ANSI-color，不同终端的自定义颜色：<br><img src="http://148.70.228.11/upload/6920cf73ad40d1285e5fb41dab3a8d3c.png" alt=""></p>
+<h2 id="0x03-Schemes设置"><a href="#0x03-Schemes设置" class="headerlink" title="0x03. Schemes设置"></a>0x03. Schemes设置</h2><p>Schemes项中，主要是设置终端字体的颜色。打开设置时，能看到schemes中的一个默认配色scheme:<br><img src="http://148.70.228.11/upload/34d504dcb1f9775dfa5bdee6aa143439.png" alt=""><br>这里的<code>foreground</code>和<code>background</code>为终端的前景和背景颜色。<code>colors</code>中对应的是<code>16-ANSI-color</code>。虽然不同终端（如Xterm,Putty,Ubuntu等）可以显示至少256种颜色，但是大部分终端都会采取16种颜色来做不同处字体的显示颜色，这就是所谓的<code>16-ANSI-color</code>方案。以下图片显示了针对这16-ANSI-color，不同终端的自定义颜色：<br><img src="http://148.70.228.11/upload/6920cf73ad40d1285e5fb41dab3a8d3c.png" alt=""></p>
 <p>Windows Terminal也是采用了这种方案。Schemes项中的<code>colors</code>项的顺序则对应以下的表格：<br><img src="http://148.70.228.11/upload/66c67b7628982683849d402843337a38.png" alt=""></p>
 <p>这个方案看似清楚，但是在网上未能找到这个16-ANSI-color的颜色具体对应到什么地方的资料。比如使用默认的方案时，命令的参数，类似<code>--c</code>，颜色非常的淡，根本看不清楚，此时就不知道要修改colors里的哪一项颜色，只能一项一项地去尝试。</p>
 <p>其实对于Schemes，网上有许多成套的配色方案：<a href="https://github.com/mbadolato/iTerm2-Color-Schemes/tree/master/windowsterminal" target="_blank" rel="noopener">iTerm2-Color-Schemes</a>，可以一个一个去尝试这些配色方案，选择自己喜欢、适配终端背景的方案。这里我写了个脚本来协助完成这个事情：</p>
@@ -528,6 +528,11 @@ height:50vh;
     <!-- paginator  -->
     <ul class="post-paginator">
         <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2019/12/17/安卓测试之Hook SSL_read和SSL_write/" title="">
+                    <div class="nextTitle">[Untitled Post]</div>
+                </a>
             
         </li>
         <li class="previous">
@@ -717,9 +722,16 @@ top:50vh;
     
     
     
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 6
+        Total : 7
         </div>
         <!-- search  -->
         
@@ -729,6 +741,20 @@ top:50vh;
     
     
     
+    
+    <div class="archive-year"> Invalid date </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span><a class="archive-post-title" href="/2019/12/17/安卓测试之Hook SSL_read和SSL_write/">[Untitled Post]</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
     
     <div class="archive-year"> 2019 </div>
     <ul class="year-list">
@@ -779,15 +805,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
     
+        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
+    
+        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
+    
         <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
     
         <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
     
-        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
-    
         <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
-    
-        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -824,11 +850,11 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
     
+        <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
+    
         <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
     
         <span class="sidebar-category-name" data-categories="二进制"><span class="iconfont-archer">&#xe60a;</span>二进制</span>
-    
-        <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
     
     </div>
     <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>

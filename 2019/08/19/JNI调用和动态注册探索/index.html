@@ -443,7 +443,7 @@ height:50vh;
 <p>若调用第三方so时，调用者的package和class和so文件中不对应，就会报Runtime java.lang.UnsatisfiedLinkError错误。package或class名不正确时：<br><img src="http://148.70.228.11/upload/ceeaacbe77a4c313b0316ce4a7f6ce66.png" alt=""></p>
 <p>所以要调用第三方so库时，只需要在APP中定义正确的package/class和调用正确的method名，JVM就能找到对应的Native方法。如果我们只拿到一个so库，或者APP加固了无法看到调用这so时的package和class名，有多种方法可以找到这个package/class。</p>
 <p>若so库只用了静态注册，所有JNI方法都可以在.dynamic导出函数表里找到。在IDA反编译：<br><img src="http://148.70.228.11/upload/d63714246340be3474071f2369e96d49.png" alt=""><br>或者简单使用objdump:<br><img src="http://148.70.228.11/upload/819d70fa12ab9894cd474d25de57149a.png" alt=""><br>在方法名中就可以明显地看到package/class。</p>
-<p>如果用frida，就是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import frida</span><br><span class="line">import sys</span><br><span class="line"></span><br><span class="line">def on_message(message, data):</span><br><span class="line">    print(message[&quot;payload&quot;])</span><br><span class="line"></span><br><span class="line">jscode = &apos;&apos;&apos;</span><br><span class="line">var moduleName = &quot;/data/app/com.application-1/lib/arm/libnative.so&quot;</span><br><span class="line">Module.load(moduleName)</span><br><span class="line">Module.enumerateExports(moduleName, &#123;</span><br><span class="line">        onMatch: function(exports)&#123;</span><br><span class="line">            send(exports.name);</span><br><span class="line">        &#125;,</span><br><span class="line">        onComplete: function()&#123;</span><br><span class="line">            send(&quot;Stop&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">device = frida.get_device_manager().enumerate_devices()[-1]</span><br><span class="line">pid = device.spawn([&quot;com.arbitary.application&quot;])    # 任意APP</span><br><span class="line">session = device.attach(pid)</span><br><span class="line">device.resume(pid)</span><br><span class="line">script = session.create_script(jscode)</span><br><span class="line">script.on(&apos;message&apos;, on_message)</span><br><span class="line">script.load()</span><br></pre></td></tr></table></figure></p>
+<p>如果用frida，就是：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> frida</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">on_message</span><span class="params">(message, data)</span>:</span></span><br><span class="line">    print(message[<span class="string">"payload"</span>])</span><br><span class="line"></span><br><span class="line">jscode = <span class="string">'''</span></span><br><span class="line"><span class="string">var moduleName = "/data/app/com.application-1/lib/arm/libnative.so"</span></span><br><span class="line"><span class="string">Module.load(moduleName)</span></span><br><span class="line"><span class="string">Module.enumerateExports(moduleName, &#123;</span></span><br><span class="line"><span class="string">        onMatch: function(exports)&#123;</span></span><br><span class="line"><span class="string">            send(exports.name);</span></span><br><span class="line"><span class="string">        &#125;,</span></span><br><span class="line"><span class="string">        onComplete: function()&#123;</span></span><br><span class="line"><span class="string">            send("Stop");</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;);</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line">device = frida.get_device_manager().enumerate_devices()[<span class="number">-1</span>]</span><br><span class="line">pid = device.spawn([<span class="string">"com.arbitary.application"</span>])    <span class="comment"># 任意APP</span></span><br><span class="line">session = device.attach(pid)</span><br><span class="line">device.resume(pid)</span><br><span class="line">script = session.create_script(jscode)</span><br><span class="line">script.on(<span class="string">'message'</span>, on_message)</span><br><span class="line">script.load()</span><br></pre></td></tr></table></figure></p>
 <p>这里有个坑就是路径必须是/data/app/…/的so,不能是/data/data/package/../，也不能是/sdcard啥的。不过这里也只能导出静态注册的导出函数。</p>
 <h2 id="0x04-IDA静态搜查so"><a href="#0x04-IDA静态搜查so" class="headerlink" title="0x04. IDA静态搜查so"></a>0x04. IDA静态搜查so</h2><p>对于动态注册的Native方法，可使用IDA来进行静态探索。动态注册函数一般都在JNI_Onload中进行，所以可以使用IDA搜查JNI_Onload函数。</p>
 <p>打开了上篇文章中的so文件，点开JNI_Onload F5后，是这样的：<br><img src="http://148.70.228.11/upload/a1cce16f789d398f3fb86f5dcf3b29e1.png" alt=""><br>这里可看到参数为 <em>int a1</em> ,IDA未能识别到参数的类型。根据<a href="http://androidxref.com/5.1.1_r6/xref/art/runtime/jni_internal.cc#3320" target="_blank" rel="noopener">jni_internal</a> 中加载so时的源码，可见JNI_Onload的原型为typedef int (<em>JNI_OnLoadFn)(JavaVM</em>, void<em>)，参数为JavaVM\</em>。根据这个，在IDA中将Jni_Onload的参数修改类型，Ctrl+Y修改为JavaVM*。同时，看到汇编中通过v3+偏移量进行函数调用，猜测v3可能为JNIEnv*类型，所以同时将v3的类型Ctrl+Y改为JNIEnv<em>。这样能帮助识别到一些函数：<br><img src="http://148.70.228.11/upload/4e8335b6018a2c729f749db64fdf6b7b.png" alt=""><br>可见这里先使用了JNIEnv</em>-&gt;FindClass，再调用了JNIEnv*-&gt;RegisterNatives。registerNativeMethods的原型如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RegisterNatives(env, <span class="string">"com/testing/jni/HelloWorldJNI"</span>,gMethods, <span class="keyword">sizeof</span>(gMethods) / <span class="keyword">sizeof</span>(gMethods[<span class="number">0</span>]));</span><br></pre></td></tr></table></figure></p>
@@ -664,9 +664,16 @@ top:50vh;
     
     
     
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 6
+        Total : 7
         </div>
         <!-- search  -->
         
@@ -676,6 +683,20 @@ top:50vh;
     
     
     
+    
+    <div class="archive-year"> Invalid date </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span><a class="archive-post-title" href="/2019/12/17/安卓测试之Hook SSL_read和SSL_write/">[Untitled Post]</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
     
     <div class="archive-year"> 2019 </div>
     <ul class="year-list">
@@ -726,15 +747,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
     
+        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
+    
+        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
+    
         <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
     
         <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
     
-        <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
-    
         <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
-    
-        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -771,11 +792,11 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
     
+        <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
+    
         <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
     
         <span class="sidebar-category-name" data-categories="二进制"><span class="iconfont-archer">&#xe60a;</span>二进制</span>
-    
-        <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
     
     </div>
     <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
