@@ -274,7 +274,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>字数统计: <span class="post-count word-count">2.8k</span>阅读时长: <span class="post-count reading-time">11 min</span></span>
+                        <span>字数统计: <span class="post-count word-count">2.9k</span>阅读时长: <span class="post-count reading-time">11 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -473,6 +473,23 @@ height:50vh;
 <p>利用此漏洞也可以执行其他的操作，如发短信：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var objSmsManager =     injectedObj.getClass().forName(&quot;android.telephony.SmsManager&quot;).getM ethod(&quot;getDefault&quot;,null).invoke(null,null);</span><br><span class="line">    objSmsManager.sendTextMessage(&quot;10086&quot;,null,&quot;this message is sent by JS when webview is loading&quot;,null,null);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
 <p>还可以利用此漏洞给系统装上恶意APP、挂马、反弹shell、执行ELF等。</p>
 <h3 id="参考-2"><a href="#参考-2" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.cnblogs.com/jhcelue/p/7338791.html" target="_blank" rel="noopener">https://www.cnblogs.com/jhcelue/p/7338791.html</a><br><a href="https://blog.csdn.net/feizhixuan46789/article/details/49155369" target="_blank" rel="noopener">https://blog.csdn.net/feizhixuan46789/article/details/49155369</a></p>
+<h1 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a>其他</h1><p>由于这个整理写在博客里实在太麻烦，所以之后的更新都会在pdf中：<br><a href="https://github.com/fanxs-t/fanxs-t.github.io/blob/master/assets/Android.pdf" target="_blank" rel="noopener">https://github.com/fanxs-t/fanxs-t.github.io/blob/master/assets/Android.pdf</a><br>还有很多没有写，以后再慢慢学吧。</p>
+<p>目前章节：</p>
+<ul>
+<li>签名检测</li>
+<li>Activity劫持</li>
+<li>Broadcast组件-导出风险</li>
+<li>Service组件-导出风险</li>
+<li>Content Provider组件-导出风险</li>
+<li>Content Provider组件-目录遍历</li>
+<li>Content Provider组件-SQL注入</li>
+<li>WebView命令执行漏洞-addJavascriptInterface</li>
+<li>任意备份漏洞</li>
+<li>可调试风险</li>
+<li>外部存储路径检测</li>
+<li>SharedPreference全局读写</li>
+<li>私有文件全局读写</li>
+</ul>
 
     </article>
     <!-- license  -->
@@ -607,7 +624,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#客户端安全"><span class="toc-number">1.</span> <span class="toc-text">客户端安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#签名安全"><span class="toc-number">1.1.</span> <span class="toc-text">签名安全</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的"><span class="toc-number">1.1.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法"><span class="toc-number">1.1.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#检测详情"><span class="toc-number">1.1.3.</span> <span class="toc-text">检测详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议"><span class="toc-number">1.1.4.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景"><span class="toc-number">1.1.5.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他"><span class="toc-number">1.1.6.</span> <span class="toc-text">其他</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考"><span class="toc-number">1.1.7.</span> <span class="toc-text">参考</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Activity劫持"><span class="toc-number">1.2.</span> <span class="toc-text">Activity劫持</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的-1"><span class="toc-number">1.2.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法-1"><span class="toc-number">1.2.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议-1"><span class="toc-number">1.2.3.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景-1"><span class="toc-number">1.2.4.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考-1"><span class="toc-number">1.2.5.</span> <span class="toc-text">参考</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WebView命令执行漏洞-addJavascriptInterface"><span class="toc-number">1.3.</span> <span class="toc-text">WebView命令执行漏洞 - addJavascriptInterface</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的-2"><span class="toc-number">1.3.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法-2"><span class="toc-number">1.3.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#检测详情-1"><span class="toc-number">1.3.3.</span> <span class="toc-text">检测详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议-2"><span class="toc-number">1.3.4.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景-2"><span class="toc-number">1.3.5.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考-2"><span class="toc-number">1.3.6.</span> <span class="toc-text">参考</span></a></li></ol></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#客户端安全"><span class="toc-number">1.</span> <span class="toc-text">客户端安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#签名安全"><span class="toc-number">1.1.</span> <span class="toc-text">签名安全</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的"><span class="toc-number">1.1.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法"><span class="toc-number">1.1.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#检测详情"><span class="toc-number">1.1.3.</span> <span class="toc-text">检测详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议"><span class="toc-number">1.1.4.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景"><span class="toc-number">1.1.5.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他"><span class="toc-number">1.1.6.</span> <span class="toc-text">其他</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考"><span class="toc-number">1.1.7.</span> <span class="toc-text">参考</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Activity劫持"><span class="toc-number">1.2.</span> <span class="toc-text">Activity劫持</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的-1"><span class="toc-number">1.2.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法-1"><span class="toc-number">1.2.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议-1"><span class="toc-number">1.2.3.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景-1"><span class="toc-number">1.2.4.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考-1"><span class="toc-number">1.2.5.</span> <span class="toc-text">参考</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WebView命令执行漏洞-addJavascriptInterface"><span class="toc-number">1.3.</span> <span class="toc-text">WebView命令执行漏洞 - addJavascriptInterface</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测目的-2"><span class="toc-number">1.3.1.</span> <span class="toc-text">检测目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法-2"><span class="toc-number">1.3.2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#检测详情-1"><span class="toc-number">1.3.3.</span> <span class="toc-text">检测详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修复建议-2"><span class="toc-number">1.3.4.</span> <span class="toc-text">修复建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关背景-2"><span class="toc-number">1.3.5.</span> <span class="toc-text">相关背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考-2"><span class="toc-number">1.3.6.</span> <span class="toc-text">参考</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#其他-1"><span class="toc-number">2.</span> <span class="toc-text">其他</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -689,9 +706,20 @@ top:50vh;
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 7
+        Total : 8
         </div>
         <!-- search  -->
         
@@ -701,6 +729,20 @@ top:50vh;
     
     
     
+    
+    <div class="archive-year"> 2020 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/02</span><a class="archive-post-title" href="/2020/02/02/被动扫描系统 - Shadow Border/">被动扫描系统 - Shadow Border</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
     
     <div class="archive-year"> 2019 </div>
     <ul class="year-list">
@@ -746,7 +788,7 @@ top:50vh;
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">07/26</span><a class="archive-post-title" href="/2018/07/26/【Reverse】某CTF在线培训平台Reverse题/">【Reverse】某CTF在线培训平台Reverse题</a>
+            <span class="archive-post-date">07/26</span><a class="archive-post-title" href="/2018/07/26/某CTF在线培训平台Reverse题/">某CTF在线培训平台Reverse题</a>
         </li>
     
     </ul></div>
@@ -758,11 +800,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
     
-        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
-    
         <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
     
         <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
+    
+        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
+    
+        <span class="sidebar-tag-name" data-tags="工具"><span class="iconfont-archer">&#xe606;</span>工具</span>
     
         <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
     
@@ -801,9 +845,11 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
     
+        <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
+    
         <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
     
-        <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
+        <span class="sidebar-category-name" data-categories="WEB"><span class="iconfont-archer">&#xe60a;</span>WEB</span>
     
         <span class="sidebar-category-name" data-categories="二进制"><span class="iconfont-archer">&#xe60a;</span>二进制</span>
     

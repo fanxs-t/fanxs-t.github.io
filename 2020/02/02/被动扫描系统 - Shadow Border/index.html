@@ -22,7 +22,7 @@
     <meta name="description" content="Fire at the hole.">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>安卓测试之Hook SSL_read和SSL_write · 饭先生 | blog</title>
+    <title>被动扫描系统 - Shadow Border · 饭先生 | blog</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -217,7 +217,7 @@
                 <a href="/">Fanxs&#39;s Blog</a>
             </div>
             <div class="post-title">
-                <a href="#" class="post-name">安卓测试之Hook SSL_read和SSL_write</a>
+                <a href="#" class="post-name">被动扫描系统 - Shadow Border</a>
             </div>
     </div>
     
@@ -247,7 +247,7 @@ height:50vh;
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            安卓测试之Hook SSL_read和SSL_write
+            被动扫描系统 - Shadow Border
             <!-- 404 -->
             
         </h1>
@@ -266,18 +266,18 @@ height:50vh;
                 
                     <div class="post-intro-tags">
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="Android">Android</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="工具">工具</a>
     
 </div>
                 
                 
                     <div class="post-intro-read">
-                        <span>字数统计: <span class="post-count word-count">1.1k</span>阅读时长: <span class="post-count reading-time">4 min</span></span>
+                        <span>字数统计: <span class="post-count word-count">2.1k</span>阅读时长: <span class="post-count reading-time">7 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
                     <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                    <span class="post-intro-time">2019/12/16</span>
+                    <span class="post-intro-time">2020/02/02</span>
                     
                     <span id="busuanzi_container_page_pv" class="busuanzi-pv">
                         <span class="iconfont-archer">&#xe602;</span>
@@ -402,24 +402,87 @@ height:50vh;
             <main class="main post-page">
     <article class="article-entry">
         <blockquote>
-<p>前言：<br>这两周在群里和朋友们水群时，看到群友转发了一句别人的话：<strong>安卓APP抓双向认证的包釜底抽薪的一招就是hook ssl_read和ssl_write两个方法，完全不用配置代理，不用管APP客户端和服务端的证书校验问题。屡试不爽～～</strong>，感觉挺有趣的，就研究了一下，这篇文章只是一时兴起。</p>
+<p>前言：<br>在之前常规的WEB安全测试时，总感觉要针对每个接口的不同参数做SQL注入检测工作非常的麻烦和费力，往往一个疏忽就漏掉了SQL注入点。同样的漏洞还有如模板注入、XSS等，可存在于不同参数之中，逐一进行检测非常的费时费力。那会儿就想整一个被动扫描系统，可方便完成常规测试时的一些重复性工作，如SQL、XSS等漏洞的检测。刚好想锻炼一下自己的能力，刚辞职空窗期也比较闲，就决定写一个自己用的顺手、能自主拓展的被动扫描系统。</p>
 </blockquote>
-<h2 id="0x00-思路"><a href="#0x00-思路" class="headerlink" title="0x00. 思路"></a>0x00. 思路</h2><p>这里的思路是，hook <code>SSL_read</code>和<code>SSL_write</code>，就可以绕过APP客户端的证书校验等问题，直接窥探到HTTPS里的请求内容和响应。</p>
-<p>先了解一下这两个函数是干嘛的。根据<a href="http://doc.ecoscentric.com/ref/openssl-ssl-ssl-read.html" target="_blank" rel="noopener">SSL_read</a>的介绍，SSL_read用于从已经建立的SSL session中读取数据，放入到缓冲区中。而<a href="http://doc.ecoscentric.com/ref/openssl-ssl-ssl-write.html#openssl-ssl-write" target="_blank" rel="noopener">SSL_write</a>则是相反，在建立的SSL Session中写入数据到缓冲区，发送到远程服务器。</p>
-<p>显而易见，在进行HTTPS数据传输时，就是SSL_read和SSL_write两个函数负责TLS/SSL数据的读写。SSL_read负责读取远程服务器发来的数据，而SSL_write则负责写入主机要发送的数据到缓冲区，发送到远程服务器。同时，这里读写的数据都是明文的，在调用SSL_read和SSL_write的前后会通过其他函数（猜测是<a href="https://linux.die.net/man/3/crypto_set_ex_data" target="_blank" rel="noopener">crypto_set_ex_data</a>）来进行SSL的加解密。</p>
-<p>在hook这两个函数，在安卓系统里用frida自然是最方便的。基本思路就形成了。当APP使用了双向证书校验，或者对服务器证书进行了校验而且APP加了壳不好hook校验函数，或者其他非HTTP应用层协议的SSL通道的情况下，这个方法能帮助揭露、修改和拦截通信数据。</p>
-<h2 id="0x01-Hook脚本"><a href="#0x01-Hook脚本" class="headerlink" title="0x01. Hook脚本"></a>0x01. Hook脚本</h2><p>这个要写脚本，凭我对Frida模块的认识，应该要写好一会儿。幸好，在Github上就有人写了在Linux上用Frida hook SSL_read和SSL_write的脚本：<a href="[https://github.com/google/ssl_logger/blob/master/ssl_logger.py](https://github.com/google/ssl_logger/blob/master/ssl_logger.py">ssl_logger.py</a></p>
-<p>这个脚本中，hook的脚本有几个主要函数，分别是<code>initializeGlobals</code>，<code>getPortsAndAddresses</code>，<code>getSslSessionId</code>和拦截调用的<code>Interceptor</code>。</p>
-<h3 id="initializeGlobals"><a href="#initializeGlobals" class="headerlink" title="initializeGlobals"></a>initializeGlobals</h3><p><img src="http://148.70.228.11/upload/03b0bf58fda0f3fd9b88a207a8c3d01f.png" alt=""><br>这个函数主要用于定位到脚本中所需要的几个API，来在下文进行Hook或调用：<code>SSL_read</code>,<code>SSL_write</code>,<code>SSL_get_fd</code>,<code>SSL_get_session</code>,<code>SSL_SESSION_get_id</code>,<code>getpeername</code>, <code>getsockname</code>, <code>ntohs</code>, <code>ntohl</code>。</p>
-<p>这里利用Frida提供的<a href="https://frida.re/docs/javascript-api/#apiresolver" target="_blank" rel="noopener">ApiResolver</a>, 选择type为<code>module</code>，可以枚举当前进程中已经加载的动态链接库的所有导出和导入函数。在安卓中，SSL_read和SSL_write函数位于libssl.so，而其他使用到几个函数，都在libc.so中。</p>
-<p>ApiResolver的enumerateMatches函数可以在枚举时，返回匹配到query语句的函数的地址。因为我对这个ApiResolver这玩意儿不大熟，就多看了一下。网上没看到query语句的语法规则，这个脚本中针对libssl的SSL_read函数作的query是“exports:<em>libssl</em>!SSL_read”，猜测一下语法规则这里exports指向导出函数，用<code>!</code>符号分割模块和指定的API，<code>*</code>模糊匹配。在枚举到SSL_read时，完整的name值是/system/lib/libssl.so!SSL_read，所以才需要<code>*</code>作模糊匹配。</p>
-<p>这个函数就是找到API的地址嘛，我寻思着用Module.enumerateExports也可以，写脚本试了一下，果然其实效果是一样的：<br><img src="http://148.70.228.11/upload/382c03185e9f36df2c7fef0d97f37039.png" alt=""></p>
-<h3 id="其他函数"><a href="#其他函数" class="headerlink" title="其他函数"></a>其他函数</h3><p><code>getPortsAndAddresses</code>函数用getpeername和getsockname两个API来获取socket的相关ip和port值。这两个API会将这些结构体struct sockaddr 的方式写入分配的内存地址addr中。根据结构体<a href="http://beej-zhtw.netdpi.net/09-man-manual/9-24-struct-sockaddr-and-pals" target="_blank" rel="noopener">sockaddr</a>的定义，增加指针偏移来读取到内存数据再使用<code>ntohs</code>, <code>ntohl</code>来转换为可读的端口号和IP地址。<code>getSslSessionId</code>函数用于获取的进行中的SSL的sessionId。</p>
-<p>最后用Interceptor来拦截SSL_read和SSL_write，在进入这两个函数时记录他们的数据，以pcap的方式保存下来，就妥了。</p>
-<h2 id="0x02-执行和效果"><a href="#0x02-执行和效果" class="headerlink" title="0x02. 执行和效果"></a>0x02. 执行和效果</h2><p>这个脚本有一些语法错误，我做了修正。而且pcap文件虽然方便，但我还是想要更直观的方法来观察来往的请求包，所以我写入了一个log函数，以html的形式输出请求和响应。</p>
-<p>以每日生鲜APP为例。在脚本开头写入要hook的app package名，以及pcap和html的地址：<br><img src="http://148.70.228.11/upload/c3c60fdf5665610883092f6f72fba34f.png" alt=""><br>执行后，console输出了hook的记录:<br><img src="http://148.70.228.11/upload/3d8e654bfc88054df3be10e73c9a717d.png" alt=""><br>结束后，pcap文件记录了所有的SSL流量：<br><img src="http://148.70.228.11/upload/1ae0568db68fe6c08350d9e126a18789.png" alt=""><br>HTML文件只会记录HTTP的数据包：<br><img src="http://148.70.228.11/upload/7f8bff968ba598a8be31e528b3ebbe57.png" alt=""></p>
-<p>不过这里有一个bug，就是获取到的双方的ip都是0.0.0.0，不知道为啥，没找到原因，之后再看吧。</p>
-<p>完成后的脚本为：<br><a href="https://github.com/fanxs-t/Android-SSL_read-write-Hook/blob/master/frida-hook.py" target="_blank" rel="noopener">https://github.com/fanxs-t/Android-SSL_read-write-Hook/blob/master/frida-hook.py</a></p>
+<h2 id="0x00-简介"><a href="#0x00-简介" class="headerlink" title="0x00. 简介"></a>0x00. 简介</h2><p><a href="https://github.com/fanxs-t/Shadow-Border" target="_blank" rel="noopener">Shadow Border</a>，就是在这样的初衷和背景下设计和编写的。Shadow Border是个被动扫描框架，用于渗透测试中的被动扫描、信息收集等并发的任务。使用了Burpsuite，Redis和python，使用者可自定义poc进行被动扫描。<br><img src="http://148.70.228.11/upload/f2bc38a7c5fa2b20954488beb6de6929.png" alt=""><br><strong>流程</strong>:</p>
+<ol>
+<li>运行ShadowBorder脚本，登录后，对scanner进行设置。设置允许扫描和镜像的请求http method，请求域名白名单，黑名单，redis账号，管理页面账号等数据。<br><img src="http://148.70.228.11/upload/0609016cd9b2f252dbadbb5bcb6d88dc.png" alt=""></li>
+<li>测试时设置Burp代理，加载Shadow Border插件，将请求镜像发送到Redis:<br><img src="http://148.70.228.11/upload/1d55900a28e9e3e4569954a3dc6c2f88.png" alt=""></li>
+<li>选择使用的poc后，开启scanner。<br><img src="http://148.70.228.11/upload/d9d9cb65d84258f2470b69f5963a3247.png" alt=""></li>
+<li>查看扫描状态：<br><img src="http://148.70.228.11/upload/77f0e59fd36b22df4fd181ae4d523d46.png" alt=""></li>
+</ol>
+<p><strong>依赖</strong>:</p>
+<ul>
+<li>Python 3.4以上</li>
+<li>Burpsuite</li>
+<li>Redis</li>
+<li>treelib (python库)</li>
+<li>requests (python库)</li>
+<li>tornado (python库)</li>
+<li>redis (python库)</li>
+<li>gevent (python库)</li>
+</ul>
+<h2 id="0x01-简单框架"><a href="#0x01-简单框架" class="headerlink" title="0x01.简单框架"></a>0x01.简单框架</h2><p><code>Shadow Border</code> 总体上参考<a href="https://github.com/ysrc/GourdScanV2" target="_blank" rel="noopener">GourdScanV2</a>，通过设置代理转发请求，针对请求进行漏洞扫描，最后在WEB界面显示扫描结果。GourdScan是一款非常优秀的被动扫描系统，但在使用中发现基于python tornado代理进行转发时，有较大的延时，所以在设计Shadow Border系统时，基于我自己的渗透测试方法和习惯，我选择了使用<code>Burpsuite</code>来做请求的镜像来提高代理速度，之后通过<code>Redis</code>做请求存储，<code>python</code>起的scanner针对请求做扫描。在scanner的编写上，我本人比较喜欢<a href="https://github.com/Xyntax/POC-T" target="_blank" rel="noopener">Poc-T</a>那种较为灵活的poc调用方式，所以基于<a href="https://github.com/Xyntax/POC-T" target="_blank" rel="noopener">Poc-T</a>编写了Shadow Border的scanner。</p>
+<p>主要的框架为：<br><img src="http://148.70.228.11/upload/0f751b72ab73ca6bcf5a76881f0e085b.png" alt=""></p>
+<ol>
+<li>测试时设置Burpsuite代理，通过Burpsuite插件，提取请求包的信息，发送到Redis。</li>
+<li>Python开启Web Server，在Web页面中点击启动Scanner。</li>
+<li>Scanner初始化后，从Redis中获取请求数据。</li>
+<li>Scanner Engine调用poc，对请求进行扫描。</li>
+<li>扫描结果存入Redis，在Web页面展示。</li>
+</ol>
+<h2 id="0x02-框架细节"><a href="#0x02-框架细节" class="headerlink" title="0x02.框架细节"></a>0x02.框架细节</h2><p>整体来看，被动扫描器这类工具大致都是由三部分组成：</p>
+<ol>
+<li>获取请求</li>
+<li>漏洞检测</li>
+<li>结果输出</li>
+</ol>
+<h3 id="获取请求"><a href="#获取请求" class="headerlink" title="获取请求"></a>获取请求</h3><p>Shadow Border通过Burp插件来镜像请求，Redis来存储请求。Burp的Proxy模块收到请求时，将请求交到插件处，插件使用Burp的API提取每个请求的：</p>
+<ul>
+<li>头部</li>
+<li>HTTP Method</li>
+<li>URL</li>
+<li>query参数</li>
+<li>post数据</li>
+</ul>
+<p>之所以选择通过Burp来截获请求，一是因为符合我自己平时渗透测试时的习惯，同时代理请求速度快，而且Burp本身提供了API来解析HTTP请求的各部分数据，不需要再自行解析，提取的数据在poc中可直接通过requests进行发包测试。</p>
+<p>在管理页面，可以对允许扫描的请求的HTTP Method，文件后缀，域名白名单，域名黑名单进行设置。Burp插件也允许对单一请求通过右键菜单进行镜像：<br><img src="http://148.70.228.11/upload/d231bce6d64ff5a084c6b9b52470aaf8.png" alt=""></p>
+<h3 id="漏洞检测"><a href="#漏洞检测" class="headerlink" title="漏洞检测"></a>漏洞检测</h3><p><img src="http://148.70.228.11/upload/68351830b9b01045e2e093355296a3b6.png" alt=""></p>
+<p>这一部分是引擎的核心功能，针对获取到的标准化的请求，调用poc进行扫描。这一模块是参考<a href="https://github.com/Xyntax/POC-T" target="_blank" rel="noopener">Poc-T</a>进行编写的，运行机理和Poc-T差不多。Scanner初始化时加载poc脚本，从Redis中获取请求后，请求和每个poc组成1个Task对象，添加到任务管理TaskManager中，再由扫描引擎Engine消耗任务队列，调用poc进行扫描。</p>
+<h3 id="结果输出"><a href="#结果输出" class="headerlink" title="结果输出"></a>结果输出</h3><p>Poc执行的结果发送到结果解析队列中，解析后将有效结果存入Redis，通过Web页面展示。</p>
+<h2 id="0x03-POC脚本"><a href="#0x03-POC脚本" class="headerlink" title="0x03.POC脚本"></a>0x03.POC脚本</h2><p><code>Shadow Border</code>的scanner模块是基于<a href="https://github.com/Xyntax/POC-T" target="_blank" rel="noopener">Poc-T</a>进行开发的，对poc的编写也基本类似，所以可以很方便地将Poc-T的脚本修改为Shadow Border的poc脚本。Shadow Border的poc要求为：</p>
+<ol>
+<li>定义了poc-info</li>
+<li>返回的结果为scan_result字典</li>
+<li>定义了poc(request)函数</li>
+</ol>
+<h3 id="poc-info-scan-result"><a href="#poc-info-scan-result" class="headerlink" title="poc-info/scan_result"></a>poc-info/scan_result</h3><p>poc中的<code>poc-info</code>变量为dict对象，定义了基础的poc信息。这部分信息会在漏洞显示时使用到。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">poc_info = &#123;</span><br><span class="line">    &apos;poc&apos;: &#123;</span><br><span class="line">        &apos;Id&apos;: &apos;&apos;,  # poc编号</span><br><span class="line">        &apos;Name&apos;: &apos;Cross Site Script (XSS)&apos;,  # poc名称</span><br><span class="line">        &apos;Author&apos;: &apos;Fanxs&apos;,  # poc作者</span><br><span class="line">        &apos;Create_date&apos;: &apos;2019-01-16&apos;,  # poc创建时间：如&apos;2014-11-19&apos;</span><br><span class="line">    &#125;,</span><br><span class="line">    &apos;vul&apos;: &#123;</span><br><span class="line">        &apos;Product&apos;: &apos;Common&apos;,  # 漏洞所在产品名称</span><br><span class="line">        &apos;Version&apos;: &apos;&apos;,  # 产品的版本号</span><br><span class="line">        &apos;Type&apos;: &apos;XSS&apos;,  # 漏洞类型</span><br><span class="line">        &apos;Severity&apos;: &apos;Low&apos;,</span><br><span class="line">        &apos;isWeb&apos;: True,</span><br><span class="line">        &apos;Description&apos;: &apos;&apos;&apos;</span><br><span class="line">            Cross Site Scripting Attack.</span><br><span class="line">            &apos;&apos;&apos;,</span><br><span class="line">        &apos;DisclosureDate&apos;: &apos;&apos;,  # poc公布时间：如&apos;2014-11-19&apos;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>scan_result</code> 为dict对象，为poc返回结果的标准格式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scan_result = &#123;</span><br><span class="line">    &apos;Target&apos;: &apos;&apos;,  # 目标URL</span><br><span class="line">    &apos;Error&apos;: &apos;&apos;,  # 记录poc失败信息</span><br><span class="line">    &apos;Success&apos;: False,  # 是否执行成功，默认值为False表示poc执行不成功，若成功请更新该值为True</span><br><span class="line">    &apos;Ret&apos;: None  # 记录额外的poc相关信息</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中<code>Ret</code>字段会在漏洞展示时print出来，用于额外漏洞信息，如payload，参数等，应为字符串类型。</p>
+<h3 id="poc函数"><a href="#poc函数" class="headerlink" title="poc函数"></a>poc函数</h3><p><code>Shadow Border</code> 会执行每个poc脚本的poc函数，函参为request对象，可访问request对象的成员属性来获取请求数据：</p>
+<p>Ex: GET <a href="https://www.baidu.com:443/test/test.html?id=1&amp;app=2" target="_blank" rel="noopener">https://www.baidu.com:443/test/test.html?id=1&amp;app=2</a></p>
+<ul>
+<li>request.url - 完整URL (“<a href="https://www.baidu.com:443/test/test.html&quot;" target="_blank" rel="noopener">https://www.baidu.com:443/test/test.html&quot;</a>)</li>
+<li>request.path - URL路径 (“/test/test.html”)</li>
+<li>request.query - query参数 （”id=1&amp;app=2”)</li>
+<li>request.headers - 头部</li>
+<li>request.body - body数据</li>
+<li>request.host - 头部中的host</li>
+<li>request.port - 目标端口 (“443”)</li>
+<li>request.method - HTTP方法 (“GET“)</li>
+<li>request.protocol - 请求协议 (“https”)</li>
+<li>request.raw - 原请求包</li>
+</ul>
+<h3 id="Treelib"><a href="#Treelib" class="headerlink" title="Treelib"></a>Treelib</h3><p>目前完成了的poc脚本只有1个XSS检测，之后再慢慢充实，协助自己渗透测试。在<code>Shadow Border</code>的scanner/utils路径下，提供了一些poc可能使用到的工具类，如以下说到的parsejson类。</p>
+<p>在平时测试时，有时会遇到请求body中json包含json数据的情况，如：<br><code>{&quot;app&quot;:&quot;exp&quot;, &quot;test&quot;:{&quot;module&quot;:123, &quot;something&quot;:&quot;test&quot;}}</code></p>
+<p>要解析和修改这种情况里的参数，我未找到相关的代码方法。在苦于怎么修改json里的json的参数值时，我发现这种结构类似于树结构。以上的例子，可用树结构解析为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Root</span><br><span class="line">├── app</span><br><span class="line">└── test    </span><br><span class="line">    ├── module    </span><br><span class="line">    └── something</span><br></pre></td></tr></table></figure></p>
+<p>在我们平时测试时，要修改的值一般为树结构中的叶节点，即为”app”, “module”, “something”三个节点参数。通过树结构，直接修改叶节点值，再转换为dict对象，就成功解析了json包含json这一类情况。由此，我利用了Treelib，在的scanner/utils下写了一个专门用于解析此类型结构的类parsejson，可实现修改其中的参数值，转换为字典格式。</p>
+<h2 id="0x04-后记"><a href="#0x04-后记" class="headerlink" title="0x04.后记"></a>0x04.后记</h2><p>整个系统的代码编写和设计都比较的粗糙，未经过完善的单元测试，目前poc也很少，在以后的使用中，会不断增加自用的poc和完善系统，来更好地帮助我在渗透测试时，省掉重复的工作。这是第一次沉下心来花了个把月写出来一个体量相对较大的系统，练练手，协助自己平时的测试也挺好。</p>
+<p>现在Shadow Border的整体框架中获取请求、扫描引擎、调用poc等多个模块之间耦合度较低。在以后整个系统更加完善和有更多的poc后，可以将Burpsuite的位置代替为（资产收集+资产发现+爬虫）模块，就可以改装成主动扫描系统，说不定以后可以整一下。</p>
+<h2 id="0x05-参考"><a href="#0x05-参考" class="headerlink" title="0x05.参考"></a>0x05.参考</h2><ol>
+<li><a href="https://github.com/ysrc/GourdScanV2" target="_blank" rel="noopener">Gourdscan v2.1 - YSRC被动式漏洞扫描系统</a></li>
+<li><a href="https://github.com/Xyntax/POC-T" target="_blank" rel="noopener">POC-T: Pentest Over Concurrent Toolkit</a></li>
+</ol>
 
     </article>
     <!-- license  -->
@@ -428,17 +491,12 @@ height:50vh;
     <ul class="post-paginator">
         <li class="next">
             
-                <div class="nextSlogan">Next Post</div>
-                <a href="/2020/02/02/被动扫描系统 - Shadow Border/" title="被动扫描系统 - Shadow Border">
-                    <div class="nextTitle">被动扫描系统 - Shadow Border</div>
-                </a>
-            
         </li>
         <li class="previous">
             
                 <div class="prevSlogan">Previous Post</div>
-                <a href="/2019/11/08/【氵】Windows Terminal 设置/" title="【氵】Windows Terminal 设置">
-                    <div class="prevTitle">【氵】Windows Terminal 设置</div>
+                <a href="/2019/12/16/安卓测试之Hook SSL_read和SSL_write/" title="安卓测试之Hook SSL_read和SSL_write">
+                    <div class="prevTitle">安卓测试之Hook SSL_read和SSL_write</div>
                 </a>
             
         </li>
@@ -554,7 +612,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x00-思路"><span class="toc-number">1.</span> <span class="toc-text">0x00. 思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x01-Hook脚本"><span class="toc-number">2.</span> <span class="toc-text">0x01. Hook脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#initializeGlobals"><span class="toc-number">2.1.</span> <span class="toc-text">initializeGlobals</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他函数"><span class="toc-number">2.2.</span> <span class="toc-text">其他函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x02-执行和效果"><span class="toc-number">3.</span> <span class="toc-text">0x02. 执行和效果</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x00-简介"><span class="toc-number">1.</span> <span class="toc-text">0x00. 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x01-简单框架"><span class="toc-number">2.</span> <span class="toc-text">0x01.简单框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x02-框架细节"><span class="toc-number">3.</span> <span class="toc-text">0x02.框架细节</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#获取请求"><span class="toc-number">3.1.</span> <span class="toc-text">获取请求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#漏洞检测"><span class="toc-number">3.2.</span> <span class="toc-text">漏洞检测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#结果输出"><span class="toc-number">3.3.</span> <span class="toc-text">结果输出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x03-POC脚本"><span class="toc-number">4.</span> <span class="toc-text">0x03.POC脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#poc-info-scan-result"><span class="toc-number">4.1.</span> <span class="toc-text">poc-info/scan_result</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#poc函数"><span class="toc-number">4.2.</span> <span class="toc-text">poc函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Treelib"><span class="toc-number">4.3.</span> <span class="toc-text">Treelib</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x04-后记"><span class="toc-number">5.</span> <span class="toc-text">0x04.后记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x05-参考"><span class="toc-number">6.</span> <span class="toc-text">0x05.参考</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
