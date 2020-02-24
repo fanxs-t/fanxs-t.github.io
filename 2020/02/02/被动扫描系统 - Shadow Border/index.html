@@ -272,7 +272,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>字数统计: <span class="post-count word-count">2.1k</span>阅读时长: <span class="post-count reading-time">7 min</span></span>
+                        <span>字数统计: <span class="post-count word-count">2k</span>阅读时长: <span class="post-count reading-time">7 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -456,8 +456,8 @@ height:50vh;
 <li>返回的结果为scan_result字典</li>
 <li>定义了poc(request)函数</li>
 </ol>
-<h3 id="poc-info-scan-result"><a href="#poc-info-scan-result" class="headerlink" title="poc-info/scan_result"></a>poc-info/scan_result</h3><p>poc中的<code>poc-info</code>变量为dict对象，定义了基础的poc信息。这部分信息会在漏洞显示时使用到。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">poc_info = &#123;</span><br><span class="line">    &apos;poc&apos;: &#123;</span><br><span class="line">        &apos;Id&apos;: &apos;&apos;,  # poc编号</span><br><span class="line">        &apos;Name&apos;: &apos;Cross Site Script (XSS)&apos;,  # poc名称</span><br><span class="line">        &apos;Author&apos;: &apos;Fanxs&apos;,  # poc作者</span><br><span class="line">        &apos;Create_date&apos;: &apos;2019-01-16&apos;,  # poc创建时间：如&apos;2014-11-19&apos;</span><br><span class="line">    &#125;,</span><br><span class="line">    &apos;vul&apos;: &#123;</span><br><span class="line">        &apos;Product&apos;: &apos;Common&apos;,  # 漏洞所在产品名称</span><br><span class="line">        &apos;Version&apos;: &apos;&apos;,  # 产品的版本号</span><br><span class="line">        &apos;Type&apos;: &apos;XSS&apos;,  # 漏洞类型</span><br><span class="line">        &apos;Severity&apos;: &apos;Low&apos;,</span><br><span class="line">        &apos;isWeb&apos;: True,</span><br><span class="line">        &apos;Description&apos;: &apos;&apos;&apos;</span><br><span class="line">            Cross Site Scripting Attack.</span><br><span class="line">            &apos;&apos;&apos;,</span><br><span class="line">        &apos;DisclosureDate&apos;: &apos;&apos;,  # poc公布时间：如&apos;2014-11-19&apos;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p><code>scan_result</code> 为dict对象，为poc返回结果的标准格式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scan_result = &#123;</span><br><span class="line">    &apos;Target&apos;: &apos;&apos;,  # 目标URL</span><br><span class="line">    &apos;Error&apos;: &apos;&apos;,  # 记录poc失败信息</span><br><span class="line">    &apos;Success&apos;: False,  # 是否执行成功，默认值为False表示poc执行不成功，若成功请更新该值为True</span><br><span class="line">    &apos;Ret&apos;: None  # 记录额外的poc相关信息</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="poc-info-scan-result"><a href="#poc-info-scan-result" class="headerlink" title="poc-info/scan_result"></a>poc-info/scan_result</h3><p>poc中的<code>poc-info</code>变量为dict对象，定义了基础的poc信息。这部分信息会在漏洞显示时使用到。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">poc_info = &#123;</span><br><span class="line">    <span class="string">'poc'</span>: &#123;</span><br><span class="line">        <span class="string">'Id'</span>: <span class="string">''</span>,  <span class="comment"># poc编号</span></span><br><span class="line">        <span class="string">'Name'</span>: <span class="string">'Cross Site Script (XSS)'</span>,  <span class="comment"># poc名称</span></span><br><span class="line">        <span class="string">'Author'</span>: <span class="string">'Fanxs'</span>,  <span class="comment"># poc作者</span></span><br><span class="line">        <span class="string">'Create_date'</span>: <span class="string">'2019-01-16'</span>,  <span class="comment"># poc创建时间：如'2014-11-19'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'vul'</span>: &#123;</span><br><span class="line">        <span class="string">'Product'</span>: <span class="string">'Common'</span>,  <span class="comment"># 漏洞所在产品名称</span></span><br><span class="line">        <span class="string">'Version'</span>: <span class="string">''</span>,  <span class="comment"># 产品的版本号</span></span><br><span class="line">        <span class="string">'Type'</span>: <span class="string">'XSS'</span>,  <span class="comment"># 漏洞类型</span></span><br><span class="line">        <span class="string">'Severity'</span>: <span class="string">'Low'</span>,</span><br><span class="line">        <span class="string">'isWeb'</span>: <span class="keyword">True</span>,</span><br><span class="line">        <span class="string">'Description'</span>: <span class="string">'''</span></span><br><span class="line"><span class="string">            Cross Site Scripting Attack.</span></span><br><span class="line"><span class="string">            '''</span>,</span><br><span class="line">        <span class="string">'DisclosureDate'</span>: <span class="string">''</span>,  <span class="comment"># poc公布时间：如'2014-11-19'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>scan_result</code> 为dict对象，为poc返回结果的标准格式：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scan_result = &#123;</span><br><span class="line">    <span class="string">'Target'</span>: <span class="string">''</span>,  <span class="comment"># 目标URL</span></span><br><span class="line">    <span class="string">'Error'</span>: <span class="string">''</span>,  <span class="comment"># 记录poc失败信息</span></span><br><span class="line">    <span class="string">'Success'</span>: <span class="keyword">False</span>,  <span class="comment"># 是否执行成功，默认值为False表示poc执行不成功，若成功请更新该值为True</span></span><br><span class="line">    <span class="string">'Ret'</span>: <span class="keyword">None</span>  <span class="comment"># 记录额外的poc相关信息</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>其中<code>Ret</code>字段会在漏洞展示时print出来，用于额外漏洞信息，如payload，参数等，应为字符串类型。</p>
 <h3 id="poc函数"><a href="#poc函数" class="headerlink" title="poc函数"></a>poc函数</h3><p><code>Shadow Border</code> 会执行每个poc脚本的poc函数，函参为request对象，可访问request对象的成员属性来获取请求数据：</p>
 <p>Ex: GET <a href="https://www.baidu.com:443/test/test.html?id=1&amp;app=2" target="_blank" rel="noopener">https://www.baidu.com:443/test/test.html?id=1&amp;app=2</a></p>
@@ -469,7 +469,7 @@ height:50vh;
 <li>request.body - body数据</li>
 <li>request.host - 头部中的host</li>
 <li>request.port - 目标端口 (“443”)</li>
-<li>request.method - HTTP方法 (“GET“)</li>
+<li>request.method - HTTP方法 (“GET”)</li>
 <li>request.protocol - 请求协议 (“https”)</li>
 <li>request.raw - 原请求包</li>
 </ul>
@@ -784,19 +784,19 @@ top:50vh;
         <div class="sidebar-panel-tags">
     <div class="sidebar-tags-name">
     
+        <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
+    
         <span class="sidebar-tag-name" data-tags="整理笔记"><span class="iconfont-archer">&#xe606;</span>整理笔记</span>
     
-        <span class="sidebar-tag-name" data-tags="Android"><span class="iconfont-archer">&#xe606;</span>Android</span>
+        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
     
         <span class="sidebar-tag-name" data-tags="CTF"><span class="iconfont-archer">&#xe606;</span>CTF</span>
     
         <span class="sidebar-tag-name" data-tags="逆向"><span class="iconfont-archer">&#xe606;</span>逆向</span>
     
-        <span class="sidebar-tag-name" data-tags="氵"><span class="iconfont-archer">&#xe606;</span>氵</span>
+        <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
     
         <span class="sidebar-tag-name" data-tags="工具"><span class="iconfont-archer">&#xe606;</span>工具</span>
-    
-        <span class="sidebar-tag-name" data-tags="二进制"><span class="iconfont-archer">&#xe606;</span>二进制</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -833,13 +833,13 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="移动安全"><span class="iconfont-archer">&#xe60a;</span>移动安全</span>
     
-        <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
-    
         <span class="sidebar-category-name" data-categories="水贴"><span class="iconfont-archer">&#xe60a;</span>水贴</span>
     
-        <span class="sidebar-category-name" data-categories="WEB"><span class="iconfont-archer">&#xe60a;</span>WEB</span>
+        <span class="sidebar-category-name" data-categories="CTF"><span class="iconfont-archer">&#xe60a;</span>CTF</span>
     
         <span class="sidebar-category-name" data-categories="二进制"><span class="iconfont-archer">&#xe60a;</span>二进制</span>
+    
+        <span class="sidebar-category-name" data-categories="WEB"><span class="iconfont-archer">&#xe60a;</span>WEB</span>
     
     </div>
     <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
